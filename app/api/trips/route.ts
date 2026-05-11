@@ -4,8 +4,9 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { Database, TripInsert } from '@/types/database'
 
+// Use an untyped service client to avoid Supabase generic inference issues
 function getServiceSupabase() {
-  return createClient<Database>(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )

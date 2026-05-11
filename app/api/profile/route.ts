@@ -2,9 +2,19 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { Database, ProfileUpdate } from '@/types/database'
+import { Database } from '@/types/database'
 
 const ALLOWED_EMOJIS = ['🚗', '🏎️', '🚙', '🛻']
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyClient = ReturnType<typeof createClient<any>>
+
+function getServiceSupabase(): AnyClient {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 /**
  * PATCH /api/profile
@@ -36,24 +46,21 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Build update payload — only include defined fields
-    const update: ProfileUpdate = {}
-    if (username !== undefined) update.username = username
-    if (car_name !== undefined) update.car_name = car_name
-    if (car_emoji !== undefined) update.car_emoji = car_emoji
+    const updateFields: Record<string, string | null> = {}
+    if (username !== undefined) updateFields.username = username ?? null
+    if (car_name !== undefined) updateFields.car_name = car_name ?? null
+    if (car_emoji !== undefined) updateFields.car_emoji = car_emoji ?? null
 
-    if (Object.keys(update).length === 0) {
+    if (Object.keys(updateFields).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
-    // Use service role client for the write to bypass RLS if needed
-    const serviceSupabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    // Use service role client for the write (bypasses RLS)
+    const serviceSupabase = getServiceSupabase()
 
     const { data, error } = await serviceSupabase
       .from('profiles')
-      .update(update)
+      .update(updateFields)
       .eq('id', user.id)
       .select()
       .single()

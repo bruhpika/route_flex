@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 
 const SPOTIFY_SCOPES = 'user-read-currently-playing user-read-recently-played'
@@ -27,7 +27,7 @@ function generateCodeChallenge(verifier: string): string {
  * Redirects to Spotify authorization URL with code_challenge.
  * Stores code_verifier in httpOnly cookie.
  */
-export async function GET(_request: NextRequest) {
+export async function GET() {
   const clientId = process.env.SPOTIFY_CLIENT_ID
   const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI
 

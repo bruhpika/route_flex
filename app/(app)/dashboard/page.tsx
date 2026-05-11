@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
+export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -19,7 +20,6 @@ export default function Dashboard() {
   const [recentTrip, setRecentTrip] = useState<Trip | null>(null)
   const [loading, setLoading] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(false)
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +55,7 @@ export default function Dashboard() {
 
   const startEngine = async () => {
     const { setActiveTrip } = useTripStore.getState()
-    
+
     try {
       if ('wakeLock' in navigator) {
         await (navigator as any).wakeLock.request('screen')
@@ -65,7 +65,6 @@ export default function Dashboard() {
       toast.error("Keep RouteFlex open while driving — iOS doesn't support background GPS")
     }
 
-
     setActiveTrip({
       startedAt: Date.now(),
       coords: [],
@@ -73,19 +72,18 @@ export default function Dashboard() {
       topSpeed: 0,
       currentSpeed: 0
     })
-    
+
     setStatus('tracking')
     router.push('/track')
   }
-
 
   const username = profile?.username || user?.user_metadata?.full_name || 'DRIVER'
 
   return (
     <div className="max-w-md mx-auto px-6 py-8 space-y-12">
-      <OnboardingModal 
-        isOpen={showOnboarding} 
-        onClose={() => setShowOnboarding(false)} 
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
       />
 
       <div className="space-y-2">
@@ -103,23 +101,23 @@ export default function Dashboard() {
           </div>
         ) : recentTrip ? (
           <div className="text-center space-y-4">
-             <div className="inline-block bg-[#FF2D78]/20 text-[#FF2D78] px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-[#FF2D78]/30 uppercase">
-               Last Flex: {recentTrip.trip_tag || 'Commute'}
-             </div>
-             <p className="text-5xl font-black font-[var(--font-orbitron)] text-white tracking-tighter">
-               {recentTrip.distance.toFixed(1)} <span className="text-sm text-gray-500 font-mono">KM</span>
-             </p>
-             <button 
+            <div className="inline-block bg-[#FF2D78]/20 text-[#FF2D78] px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-[#FF2D78]/30 uppercase">
+              Last Flex: {recentTrip.trip_tag || 'Commute'}
+            </div>
+            <p className="text-5xl font-black font-[var(--font-orbitron)] text-white tracking-tighter">
+              {recentTrip.distance.toFixed(1)} <span className="text-sm text-gray-500 font-mono">KM</span>
+            </p>
+            <button
               onClick={() => router.push(`/result?id=${recentTrip.id}`)}
               className="text-[10px] text-gray-500 hover:text-[#00F5FF] transition-colors font-mono uppercase tracking-widest underline decoration-[#00F5FF]/30"
-             >
-               View Result Card
-             </button>
+            >
+              View Result Card
+            </button>
           </div>
         ) : (
           <div className="w-full flex flex-col items-center gap-6">
             <div className="relative w-full h-16 overflow-hidden">
-              <motion.div 
+              <motion.div
                 animate={{ x: ['-120%', '120%'] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
                 className="absolute flex items-center gap-4 whitespace-nowrap"
@@ -155,17 +153,17 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
-           <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Status</p>
-           <p className="text-xs font-bold text-green-500 flex items-center gap-2">
-             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-             GPS READY
-           </p>
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Status</p>
+          <p className="text-xs font-bold text-green-500 flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            GPS READY
+          </p>
         </div>
         <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
-           <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Car</p>
-           <p className="text-xs font-bold text-white truncate">
-             {profile?.car_emoji || '🚗'} {profile?.car_name || 'SELECT CAR'}
-           </p>
+          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Car</p>
+          <p className="text-xs font-bold text-white truncate">
+            {profile?.car_emoji || '🚗'} {profile?.car_name || 'SELECT CAR'}
+          </p>
         </div>
       </div>
     </div>

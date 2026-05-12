@@ -1,10 +1,6 @@
 import Groq from 'groq-sdk'
 import { NextRequest, NextResponse } from 'next/server'
 
-const client = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-})
-
 const FALLBACK_CAPTION = 'Another drive. Another flex. 🔥'
 
 interface CaptionRequestBody {
@@ -20,8 +16,14 @@ interface CaptionRequestBody {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body: Partial<CaptionRequestBody> = await request.json()
+    const apiKey = process.env.GROQ_API_KEY
 
+    if (!apiKey) {
+      console.warn('[/api/generate-caption] GROQ_API_KEY is missing. Using fallback.')
+      return NextResponse.json({ caption: FALLBACK_CAPTION })
+    }
+
+    const body: Partial<CaptionRequestBody> = await request.json()
     const { distance, topSpeed, smoothness } = body
 
     // Validate all required fields
@@ -38,6 +40,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    const client = new Groq({ apiKey })
 
     try {
       const completion = await client.chat.completions.create({
@@ -71,7 +75,6 @@ Never mention illegal speeds. Return only the caption text, no quotes.`,
       )
     } catch (groqError) {
       console.error('[/api/generate-caption] Groq API error:', groqError)
-      // Graceful fallback — don't fail the entire trip save flow
       return NextResponse.json({ caption: FALLBACK_CAPTION })
     }
   } catch (err) {

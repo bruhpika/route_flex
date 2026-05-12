@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
@@ -87,10 +88,12 @@ const Navbar = () => {
             <DropdownMenuTrigger className="outline-none">
               <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10 bg-gray-900">
                 {user.user_metadata.avatar_url ? (
-                  <img 
+                  <Image 
                     src={user.user_metadata.avatar_url} 
                     alt="Avatar" 
-                    className="w-full h-full object-cover"
+                    width={32}
+                    height={32}
+                    className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-primary">

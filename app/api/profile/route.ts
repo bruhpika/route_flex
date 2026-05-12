@@ -1,20 +1,11 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { Database } from '@/types/database'
 
 const ALLOWED_EMOJIS = ['🚗', '🏎️', '🚙', '🛻']
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyClient = ReturnType<typeof createClient<any>>
 
-function getServiceSupabase(): AnyClient {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 /**
  * PATCH /api/profile
@@ -46,7 +37,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Build update payload — only include defined fields
-    const updateFields: Record<string, string | null> = {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateFields: any = {}
     if (username !== undefined) updateFields.username = username ?? null
     if (car_name !== undefined) updateFields.car_name = car_name ?? null
     if (car_emoji !== undefined) updateFields.car_emoji = car_emoji ?? null
@@ -61,9 +53,8 @@ export async function PATCH(request: NextRequest) {
       .from('profiles')
       .upsert({
         id: user.id,
-        ...updateFields,
-        updated_at: new Date().toISOString()
-      })
+        ...updateFields
+      } as any) // eslint-disable-line @typescript-eslint/no-explicit-any
       .select()
       .single()
 

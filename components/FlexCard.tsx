@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
+import Image from 'next/image'
 import { getScoreLabel } from '@/lib/smoothness'
 import { Trip, SpotifyTrack } from '@/types'
 
@@ -40,14 +41,20 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
       {/* Background Map with Slow Zoom */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {trip.mapUrl ? (
-          <motion.img 
-            src={trip.mapUrl} 
-            alt="Route Map" 
-            className="w-full h-full object-cover grayscale brightness-50 contrast-125"
+          <motion.div
             initial={{ scale: 1 }}
             animate={{ scale: 1.1 }}
             transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-          />
+            className="w-full h-full relative"
+          >
+            <Image 
+              src={trip.mapUrl} 
+              alt="Route Map" 
+              fill
+              className="object-cover grayscale brightness-50 contrast-125"
+              sizes="500px"
+            />
+          </motion.div>
         ) : (
           <div className="w-full h-full bg-neutral-900" />
         )}
@@ -117,7 +124,13 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
         {spotifyTrack && (
           <div className="mt-6 flex items-center gap-4 group/spotify">
             <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-white/10 shadow-lg">
-              <img src={spotifyTrack.albumArt} alt="Album" className="w-full h-full object-cover" />
+              <Image 
+                src={spotifyTrack.albumArt} 
+                alt="Album" 
+                width={40}
+                height={40}
+                className="object-cover" 
+              />
               <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover/spotify:opacity-100 transition-opacity" />
             </div>
             <div className="flex flex-col">

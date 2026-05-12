@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation'
 import { useTripStore } from '@/store/tripStore'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { soundManager } from '@/lib/sounds'
 
 export default function TrackPage() {

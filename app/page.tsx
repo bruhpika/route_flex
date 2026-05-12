@@ -6,7 +6,6 @@ import { motion, Variants } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { soundManager } from '@/lib/sounds'
-import { cn } from '@/lib/utils'
 
 export default function LandingPage() {
   const handleSignIn = async () => {

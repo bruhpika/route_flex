@@ -48,7 +48,7 @@ export default function Dashboard() {
 
         if (tripsRes.ok) {
           const tripsData = await tripsRes.json()
-          setTrips(tripsData || [])
+          setTrips(tripsData.trips || [])
         }
 
         if (spotifyRes.ok) {

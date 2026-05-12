@@ -1,16 +1,7 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { Database, TripInsert } from '@/types/database'
-
-// Use an untyped service client to avoid Supabase generic inference issues
-function getServiceSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 /**
  * POST /api/trips
@@ -44,10 +35,9 @@ export async function POST(request: NextRequest) {
       started_at: body.started_at ?? new Date().toISOString(),
     }
 
-    const serviceSupabase = getServiceSupabase()
-    const { data, error } = await serviceSupabase
+    const { data, error } = await supabase
       .from('trips')
-      .insert(tripPayload)
+      .insert(tripPayload as any) // Cast to any to avoid strict schema mismatch if types are slightly out of sync
       .select()
       .single()
 
@@ -65,10 +55,13 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/trips
- * Returns the 10 most recent trips for the authenticated user.
+ * Returns the 10 most recent trips for the authenticated user, or a specific trip if 'id' is provided.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const tripId = searchParams.get('id')
+
     const supabase = createRouteHandlerClient<Database>({ cookies })
     const {
       data: { user },
@@ -79,20 +72,24 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const serviceSupabase = getServiceSupabase()
-    const { data, error } = await serviceSupabase
-      .from('trips')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('started_at', { ascending: false })
-      .limit(10)
+    let query = supabase.from('trips').select('*').eq('user_id', user.id)
 
-    if (error) {
-      console.error('[GET /api/trips]', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (tripId) {
+      const { data, error } = await query.eq('id', tripId).single()
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      return NextResponse.json(data)
+    } else {
+      const { data, error } = await query
+        .order('started_at', { ascending: false })
+        .limit(10)
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      return NextResponse.json({ trips: data })
     }
-
-    return NextResponse.json({ trips: data })
   } catch (err) {
     console.error('[GET /api/trips] unexpected error', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -14,7 +14,7 @@ export default function OfflinePage() {
       </div>
       
       <div className="space-y-4">
-        <h1 className="text-4xl font-black font-[var(--font-orbitron)] tracking-tighter">YOU&apos;RE OFFLINE</h1>
+        <h1 className="text-4xl font-black font-display tracking-tighter">YOU&apos;RE OFFLINE</h1>
         <p className="font-mono text-gray-500 text-sm max-w-xs mx-auto leading-relaxed uppercase tracking-widest">
           Start a drive when you&apos;re back. Telemetry requires a stable connection.
         </p>

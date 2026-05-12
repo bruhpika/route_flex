@@ -51,6 +51,10 @@ const config: Config = {
   				'5': 'var(--chart-5)'
   			}
   		},
+  		fontFamily: {
+  			sans: ['var(--font-body)', 'sans-serif'],
+  			display: ['var(--font-display)', 'serif']
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

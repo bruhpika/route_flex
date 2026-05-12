@@ -36,7 +36,6 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    // Build update payload — only include defined fields
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateFields: any = {}
     if (username !== undefined) updateFields.username = username ?? null
@@ -54,7 +53,7 @@ export async function PATCH(request: NextRequest) {
       .upsert({
         id: user.id,
         ...updateFields
-      } as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+      })
       .select()
       .single()
 

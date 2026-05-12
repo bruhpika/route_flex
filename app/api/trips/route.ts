@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
       started_at: body.started_at ?? new Date().toISOString(),
     }
 
-    const { data, error } = await supabase
-      .from('trips')
-      .insert(tripPayload as any) // Cast to any to avoid strict schema mismatch if types are slightly out of sync
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('trips') as any)
+      .insert(tripPayload)
       .select()
       .single()
 
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    let query = supabase.from('trips').select('*').eq('user_id', user.id)
+    const query = supabase.from('trips').select('*').eq('user_id', user.id)
 
     if (tripId) {
       const { data, error } = await query.eq('id', tripId).single()

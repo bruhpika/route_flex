@@ -60,8 +60,11 @@ export async function PATCH(request: NextRequest) {
 
     const { data, error } = await serviceSupabase
       .from('profiles')
-      .update(updateFields)
-      .eq('id', user.id)
+      .upsert({ 
+        id: user.id,
+        ...updateFields,
+        updated_at: new Date().toISOString()
+      })
       .select()
       .single()
 

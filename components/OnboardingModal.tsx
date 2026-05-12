@@ -84,11 +84,12 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                     {EMOJIS.map((emoji) => (
                       <button
                         key={emoji}
+                        type="button"
                         onClick={() => setSelectedEmoji(emoji)}
-                        className={`text-3xl p-4 flex-1 border transition-all ${
+                        className={`text-3xl p-4 flex-1 border transition-all duration-200 active:scale-95 ${
                           selectedEmoji === emoji 
-                          ? 'border-[#00F5FF] bg-[#00F5FF]/10' 
-                          : 'border-white/5 bg-white/5 hover:border-white/20'
+                          ? 'border-[#00F5FF] bg-[#00F5FF]/20 shadow-[0_0_15px_rgba(0,245,255,0.1)]' 
+                          : 'border-white/5 bg-white/5 hover:bg-white/10'
                         }`}
                       >
                         {emoji}

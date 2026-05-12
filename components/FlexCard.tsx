@@ -125,7 +125,7 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
           <div className="mt-6 flex items-center gap-4 group/spotify">
             <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-white/10 shadow-lg">
               <Image 
-                src={spotifyTrack.albumArt} 
+                src={spotifyTrack.album_art_url} 
                 alt="Album" 
                 width={40}
                 height={40}

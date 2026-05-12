@@ -14,5 +14,5 @@ export interface Trip {
 export interface SpotifyTrack {
   name: string
   artist: string
-  albumArt: string
+  album_art_url: string
 }

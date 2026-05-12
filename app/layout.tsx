@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { 
   Orbitron, 
   Space_Mono, 
@@ -41,6 +41,20 @@ const courierPrime = Courier_Prime({
 export const metadata: Metadata = {
   title: "RouteFlex",
   description: "Turn your drive into a flex.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "RouteFlex",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#050510",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

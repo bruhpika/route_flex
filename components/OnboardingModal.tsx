@@ -119,7 +119,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                     <h2 className="text-2xl font-black font-[var(--font-orbitron)] text-[#1DB954] tracking-tighter uppercase">
                       SYNC YOUR VIBE <span className="text-white">♫</span>
                     </h2>
-                    <p className="text-gray-500 font-mono text-xs uppercase">Add what you're listening to onto your flex card</p>
+                    <p className="text-gray-500 font-mono text-xs uppercase">Add what you&apos;re listening to onto your flex card</p>
                   </div>
 
                   <div className="p-8 bg-[#1DB954]/5 border border-[#1DB954]/20 rounded-2xl text-center space-y-4">

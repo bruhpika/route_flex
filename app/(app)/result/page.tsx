@@ -3,7 +3,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useState, useRef, Suspense } from 'react'
+import { useEffect, useState, useRef, Suspense, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { calculateSmoothnessScore } from '@/lib/smoothness'
@@ -45,7 +45,7 @@ function ResultContent() {
     return null
   }
 
-  const processTrip = async () => {
+  const processTrip = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -133,11 +133,11 @@ function ResultContent() {
       toast.error('Processing failed')
       setLoading(false)
     }
-  }
+  }, [tripId, router])
 
   useEffect(() => {
     processTrip()
-  }, [tripId, router])
+  }, [processTrip])
 
   const handleShare = async () => {
     if (!cardRef.current) return

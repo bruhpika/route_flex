@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { getScoreLabel } from '@/lib/smoothness'
 import { Trip, SpotifyTrack } from '@/types'
-import { cn } from '@/lib/utils'
 
 interface FlexCardProps {
   trip: Trip
@@ -47,7 +46,7 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
             className="w-full h-full object-cover grayscale brightness-50 contrast-125"
             initial={{ scale: 1 }}
             animate={{ scale: 1.1 }}
-            transition={{ duration: 20, repeat: Infinity, repeatType: "alternate", ease: "easeInOut" }}
+            transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
           />
         ) : (
           <div className="w-full h-full bg-neutral-900" />
@@ -68,7 +67,7 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
             </h3>
           </div>
           <div className="glass-pill px-3 py-1 text-[10px] font-bold tracking-widest text-text/60 uppercase">
-            {new Date(trip.started_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            {new Date(trip.startedAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
           </div>
         </div>
 
@@ -132,7 +131,7 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
       {/* AI Caption Overlay (Shows on Hover or in Detail) */}
       <div className="absolute inset-0 z-20 bg-[#0A0B0A]/90 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center p-12 text-center pointer-events-none">
         <p className="font-display text-2xl text-text leading-relaxed italic">
-          "{trip.ai_caption || "A silent dialogue between driver and asphalt."}"
+          &quot;{trip.ai_caption || "A silent dialogue between driver and asphalt."}&quot;
         </p>
       </div>
     </div>

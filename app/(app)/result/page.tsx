@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
 import confetti from 'canvas-confetti'
 import { Trip, SpotifyTrack } from '@/types'
-import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 function ResultContent() {

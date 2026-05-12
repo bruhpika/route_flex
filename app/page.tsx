@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 
@@ -16,7 +16,7 @@ export default function LandingPage() {
     })
   }
 
-  const container = {
+  const container: Variants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -27,9 +27,16 @@ export default function LandingPage() {
     },
   }
 
-  const item = {
+  const item: Variants = {
     hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { 
+        duration: 1, 
+        ease: [0.16, 1, 0.3, 1] 
+      } 
+    },
   }
 
   return (
@@ -39,7 +46,7 @@ export default function LandingPage() {
         <motion.div 
           initial={{ scale: 1 }}
           animate={{ scale: 1.1 }}
-          transition={{ duration: 20, repeat: Infinity, repeatType: "alternate", ease: "easeInOut" }}
+          transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
           className="w-full h-full bg-cover bg-center"
           style={{ 
             backgroundImage: `linear-gradient(to bottom, rgba(10, 11, 10, 0.3), rgba(10, 11, 10, 0.8)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKuSQAFfB5VYJ7LkHDLsaZm34vvc0kKo4SwV_ERGTNdzq4koGXMpThsCP_Heug0dtAUQgRGhXtaKKNpv4TmpmP-khbmLSmjqsWdVLm4h0pQp6Y7M3CYHPU_iKszA9d5595tXHdTmaG-0-S2WywrOvN7vpnEWhK7SNFp9IlWlsogJbiZ0aj7pIEbOj-H-Em1W0dbBPg63_sJ1zTzyQkcd_gaT9FF0AOtX1fff0qWswVHkpDvyE1K8ViJ0gnO7Nrd81DBOmKHH-5HIVR')` 

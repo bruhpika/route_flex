@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useTripStore } from '@/store/tripStore'
 import { useAuthStore } from '@/store/authStore'
@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import OnboardingModal from '@/components/OnboardingModal'
 import { toast } from 'react-hot-toast'
 import { Trip } from '@/types'
-import { Skeleton } from '@/components/ui/skeleton'
 import FlexCard from '@/components/FlexCard'
 import { cn } from '@/lib/utils'
 
@@ -164,8 +163,8 @@ export default function Dashboard() {
                   <FlexCard 
                     trip={trip} 
                     showRoute={true} 
-                    carName={profile?.car_name} 
-                    carEmoji={profile?.car_emoji} 
+                    carName={profile?.car_name || undefined} 
+                    carEmoji={profile?.car_emoji || undefined} 
                   />
                 </motion.div>
               ))}

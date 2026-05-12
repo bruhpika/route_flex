@@ -73,7 +73,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                       The <span className="italic font-light text-muted">Aesthetic</span> Machine
                     </h2>
                     <p className="text-muted text-sm tracking-wide leading-relaxed">
-                      Every drive is a narrative. Tell us what vehicle you're using to navigate the urban silence.
+                      Every drive is a narrative. Tell us what vehicle you&apos;re using to navigate the urban silence.
                     </p>
                   </div>
 

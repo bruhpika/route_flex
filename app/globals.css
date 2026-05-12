@@ -9,108 +9,58 @@
 }
 
 @layer base {
-  /* Neon Cyberpunk */
-  [data-theme="cyberpunk"] {
-    --bg: #050510;
-    --primary: #00F5FF;
-    --accent: #FF2D78;
-    --glow: #7B2FFF;
-    --text: #F0F0FF;
-    --card-bg: #0D0D1A;
-    --font-display: var(--font-orbitron), sans-serif;
-    --font-mono: var(--font-space-mono), monospace;
-    
-    --background: 240 40% 4%;
-    --foreground: 240 10% 96%;
-    --primary-hsl: 180 100% 50%;
-  }
-
-  /* Minimalist Dark */
-  [data-theme="minimal"] {
-    --bg: #0A0A0A;
-    --primary: #F5F5F5;
-    --accent: #C8FF00;
-    --glow: #C8FF00;
-    --text: #F5F5F5;
-    --card-bg: #141414;
-    --font-display: 'Clash Display', sans-serif;
-    --font-mono: var(--font-dm-mono), monospace;
-
-    --background: 0 0% 4%;
-    --foreground: 0 0% 96%;
-    --primary-hsl: 0 0% 96%;
-  }
-
-  /* Y2K / Retro */
-  [data-theme="y2k"] {
-    --bg: #1A0533;
-    --primary: #FF6EC7;
-    --accent: #00FF94;
-    --glow: #FF6EC7;
-    --text: #FFFFFF;
-    --card-bg: #2D0A4E;
-    --font-display: var(--font-press-start), cursive;
-    --font-mono: var(--font-courier), monospace;
-
-    --background: 270 82% 11%;
-    --foreground: 0 0% 100%;
-    --primary-hsl: 324 100% 71%;
-  }
-
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
+    --background: 0 0% 4%;
+    --foreground: 30 10% 92%;
+    
+    --bg: #0A0B0A;
+    --text: #EAE8E3;
+    --primary: #edbc1d;
+    --muted: #8C8D8A;
+    --surface-glass: rgba(234, 232, 227, 0.04);
+    --border-glass: rgba(234, 232, 227, 0.08);
+
+    --font-display: var(--font-display), serif;
+    --font-body: var(--font-body), sans-serif;
   }
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+  /* Map old theme vars to new Curateur style for compatibility during transition */
+  [data-theme] {
+    --bg: #0A0B0A;
+    --text: #EAE8E3;
+    --primary: #edbc1d;
+    --accent: #edbc1d;
+    --glow: rgba(237, 188, 29, 0.5);
   }
 
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
     background-color: var(--bg);
     color: var(--text);
-    transition: background-color 0.5s ease;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
   }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-pill {
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+  }
+}
 
   @keyframes glitch {
     0% { transform: translate(0); }

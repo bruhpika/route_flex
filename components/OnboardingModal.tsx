@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { toast } from 'react-hot-toast'
+import { cn } from '@/lib/utils'
 
 interface OnboardingModalProps {
   isOpen: boolean
@@ -55,94 +56,106 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl">
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="w-full max-w-md bg-[#0D0D1A] border-t-2 border-[#00F5FF] p-8 rounded-t-3xl shadow-[0_-20px_50px_rgba(0,245,255,0.3)]"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="w-full max-w-lg glass-panel p-10 md:p-12 flex flex-col gap-10"
           >
-            <div className="space-y-6">
+            <div className="space-y-8">
               {step === 1 ? (
                 <>
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-black font-[var(--font-orbitron)] text-[#00F5FF] tracking-tighter uppercase">
-                      What are you driving? <span className="text-white">🚗</span>
+                  <div className="space-y-4">
+                    <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">01 / Onboarding</span>
+                    <h2 className="font-display text-4xl md:text-5xl text-text leading-tight">
+                      The <span className="italic font-light text-muted">Aesthetic</span> Machine
                     </h2>
-                    <p className="text-gray-500 font-mono text-xs uppercase">Customize your flex card profile</p>
+                    <p className="text-muted text-sm tracking-wide leading-relaxed">
+                      Every drive is a narrative. Tell us what vehicle you're using to navigate the urban silence.
+                    </p>
                   </div>
 
-                  <Input 
-                    value={carName}
-                    onChange={(e) => setCarName(e.target.value)}
-                    placeholder="e.g. 2019 Honda City"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 h-14 rounded-none focus-visible:ring-[#00F5FF] font-mono"
-                  />
+                  <div className="space-y-6">
+                    <div className="relative group">
+                      <Input 
+                        value={carName}
+                        onChange={(e) => setCarName(e.target.value)}
+                        placeholder="Vehicle Name (e.g. 2019 Porsche 911)"
+                        className="bg-transparent border-none border-b border-white/10 text-text placeholder:text-muted/50 h-14 rounded-none focus-visible:ring-0 px-0 text-lg transition-all focus:border-primary font-display italic"
+                      />
+                      <div className="absolute bottom-0 left-0 h-[1px] bg-primary w-0 group-focus-within:w-full transition-all duration-700" />
+                    </div>
 
-                  <div className="flex justify-between gap-2">
-                    {EMOJIS.map((emoji) => (
-                      <button
-                        key={emoji}
-                        type="button"
-                        onClick={() => setSelectedEmoji(emoji)}
-                        className={`text-3xl p-4 flex-1 border transition-all duration-200 active:scale-95 ${
-                          selectedEmoji === emoji 
-                          ? 'border-[#00F5FF] bg-[#00F5FF]/20 shadow-[0_0_15px_rgba(0,245,255,0.1)]' 
-                          : 'border-white/5 bg-white/5 hover:bg-white/10'
-                        }`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
+                    <div className="flex gap-4">
+                      {EMOJIS.map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => setSelectedEmoji(emoji)}
+                          className={cn(
+                            "w-16 h-16 rounded-sm border flex items-center justify-center text-3xl transition-all duration-500",
+                            selectedEmoji === emoji 
+                              ? "border-primary bg-primary/10 text-text" 
+                              : "border-white/5 bg-white/5 hover:border-white/20 text-muted"
+                          )}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="pt-4 space-y-4">
+                  <div className="flex flex-col gap-6 pt-4">
                     <Button
                       onClick={handleSaveCar}
                       disabled={loading}
-                      className="w-full bg-[#00F5FF] text-black font-black py-8 text-xl rounded-none hover:bg-[#00D1FF] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="w-full bg-primary text-black font-bold h-16 rounded-sm hover:bg-primary/90 transition-all text-sm tracking-[0.2em] uppercase"
                     >
-                      {loading ? 'SAVING...' : 'SAVE & CONTINUE'}
+                      {loading ? 'Registering...' : 'Complete Profile'}
                     </Button>
 
                     <button 
                       onClick={onClose}
-                      className="w-full text-gray-500 font-mono text-sm uppercase tracking-widest hover:text-white transition-colors"
+                      className="text-muted text-[10px] font-bold tracking-[0.2em] uppercase hover:text-text transition-colors"
                     >
-                      SKIP FOR NOW
+                      Skip for now
                     </button>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-black font-[var(--font-orbitron)] text-[#1DB954] tracking-tighter uppercase">
-                      SYNC YOUR VIBE <span className="text-white">♫</span>
+                  <div className="space-y-4">
+                    <span className="text-[10px] font-medium tracking-[0.3em] uppercase text-primary">02 / Integration</span>
+                    <h2 className="font-display text-4xl md:text-5xl text-text leading-tight">
+                      Material <span className="italic font-light text-muted">Memory</span>
                     </h2>
-                    <p className="text-gray-500 font-mono text-xs uppercase">Add what you&apos;re listening to onto your flex card</p>
+                    <p className="text-muted text-sm tracking-wide leading-relaxed">
+                      Connect your Spotify account to embed your auditory journey directly into your flex card.
+                    </p>
                   </div>
 
-                  <div className="p-8 bg-[#1DB954]/5 border border-[#1DB954]/20 rounded-2xl text-center space-y-4">
-                     <div className="w-16 h-16 bg-[#1DB954] rounded-full mx-auto flex items-center justify-center text-black text-3xl font-bold">
+                  <div className="p-12 bg-white/5 border border-white/10 rounded-sm text-center space-y-6 group cursor-pointer hover:bg-white/[0.07] transition-all">
+                     <div className="w-16 h-16 bg-[#1DB954] rounded-full mx-auto flex items-center justify-center text-black text-3xl group-hover:scale-110 transition-transform">
                        ♫
                      </div>
-                     <p className="text-sm text-gray-300 font-mono">Connect Spotify to show off your music choice alongside your drive stats.</p>
+                     <p className="text-xs text-muted tracking-widest uppercase font-medium">Sync Auditory Telemetry</p>
                   </div>
 
-                  <div className="pt-4 space-y-4">
+                  <div className="flex flex-col gap-6 pt-4">
                     <Button
                       onClick={handleSpotifyConnect}
-                      className="w-full bg-[#1DB954] text-black font-black py-8 text-xl rounded-none hover:bg-[#1ed760] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="w-full bg-[#1DB954] text-black font-bold h-16 rounded-sm hover:bg-[#1ed760] transition-all text-sm tracking-[0.2em] uppercase"
                     >
-                      CONNECT SPOTIFY
+                      Connect Spotify
                     </Button>
 
                     <button 
                       onClick={onClose}
-                      className="w-full text-gray-500 font-mono text-sm uppercase tracking-widest hover:text-white transition-colors"
+                      className="text-muted text-[10px] font-bold tracking-[0.2em] uppercase hover:text-text transition-colors"
                     >
-                      FINISH LATER
+                      Finish Later
                     </button>
                   </div>
                 </>

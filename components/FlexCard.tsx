@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { getScoreLabel } from '@/lib/smoothness'
 import { Trip, SpotifyTrack } from '@/types'
+import { cn } from '@/lib/utils'
 
 interface FlexCardProps {
   trip: Trip
-  template: 'cyberpunk' | 'minimal' | 'y2k'
+  template?: string
   showRoute: boolean
   spotifyTrack?: SpotifyTrack
   carName?: string
@@ -26,7 +27,7 @@ const Counter = ({ value, duration = 2, precision = 0 }: { value: number, durati
   return <motion.span>{rounded}</motion.span>
 }
 
-const FlexCard = ({ trip, template, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
+const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -36,140 +37,104 @@ const FlexCard = ({ trip, template, spotifyTrack, carName, carEmoji }: FlexCardP
   const scoreLabel = getScoreLabel(trip.smoothnessScore)
 
   return (
-    <div 
-      data-theme={template}
-      className="relative aspect-[9/16] w-full max-w-[400px] bg-[var(--bg)] text-[var(--text)] rounded-[32px] overflow-hidden flex flex-col p-6 border border-white/10 shadow-2xl transition-all duration-500 font-[var(--font-mono)]"
-    >
-      {/* Theme Specific Extras */}
-      {template === 'y2k' && (
-        <>
-          <div className="absolute inset-0 pointer-events-none z-50 bg-[repeating-linear-gradient(transparent_50%,rgba(0,0,0,0.05)_50%)] bg-[length:100%_4px]" />
-          <svg className="absolute hidden">
-            <filter id="grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-              <feComponentTransfer>
-                <feFuncA type="linear" slope="0.1" />
-              </feComponentTransfer>
-            </filter>
-          </svg>
-          <div className="absolute inset-0 pointer-events-none z-40 opacity-50" style={{ filter: 'url(#grain)' }} />
-        </>
-      )}
-
-      {template === 'cyberpunk' && (
-        <div className="absolute inset-0 border-[3px] border-transparent animate-hue-rotate rounded-[32px] pointer-events-none z-50" 
-             style={{ 
-               backgroundImage: 'linear-gradient(var(--bg), var(--bg)), linear-gradient(to right, var(--primary), var(--accent))', 
-               backgroundOrigin: 'border-box', 
-               backgroundClip: 'content-box, border-box' 
-             }} />
-      )}
-
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6 z-10">
-        <h3 className="font-[var(--font-display)] text-lg font-black tracking-tighter uppercase">ROUTEFLEX</h3>
-        <div className="bg-[var(--accent)] text-black px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase">
-          {trip.trip_tag || 'COMMUTE'}
-        </div>
-      </div>
-
-      {/* Map */}
-      <div className="relative w-full h-[220px] rounded-2xl overflow-hidden mb-6 border border-white/5 z-10 bg-black">
+    <div className="relative aspect-[3/4] w-full max-w-[500px] bg-[#0A0B0A] overflow-hidden rounded-sm group cursor-pointer border border-white/5 shadow-2xl">
+      {/* Background Map with Slow Zoom */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         {trip.mapUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img 
+          <motion.img 
             src={trip.mapUrl} 
             alt="Route Map" 
-            className="w-full h-full object-cover grayscale brightness-90 contrast-125"
+            className="w-full h-full object-cover grayscale brightness-50 contrast-125"
+            initial={{ scale: 1 }}
+            animate={{ scale: 1.1 }}
+            transition={{ duration: 20, repeat: Infinity, repeatType: "alternate", ease: "easeInOut" }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-800 text-[10px] uppercase tracking-widest">
-            Generating Map...
+          <div className="w-full h-full bg-neutral-900" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B0A] via-[#0A0B0A]/40 to-transparent" />
+      </div>
+
+      {/* Content Overlay */}
+      <div className="absolute inset-0 z-10 flex flex-col p-8 md:p-12">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-auto">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-primary">
+              {trip.trip_tag || 'Featured Drive'}
+            </span>
+            <h3 className="font-display text-3xl md:text-4xl text-text leading-tight max-w-[240px]">
+              The <span className="italic font-light">Geometry</span> of Motion
+            </h3>
+          </div>
+          <div className="glass-pill px-3 py-1 text-[10px] font-bold tracking-widest text-text/60 uppercase">
+            {new Date(trip.started_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+          </div>
+        </div>
+
+        {/* Stats Glass Panel */}
+        <div className="glass-panel w-full p-6 mt-auto flex flex-col gap-6">
+          {/* Main Stats Row */}
+          <div className="grid grid-cols-2 gap-8">
+            <div className="space-y-1">
+              <p className="text-[9px] font-medium text-muted uppercase tracking-[0.2em]">Distance</p>
+              <p className="text-2xl font-display text-text">
+                {mounted ? <Counter value={trip.distance} precision={1} /> : trip.distance.toFixed(1)}
+                <span className="text-xs italic ml-1 opacity-40">km</span>
+              </p>
+            </div>
+            <div className="space-y-1 text-right">
+              <p className="text-[9px] font-medium text-muted uppercase tracking-[0.2em]">Smoothness</p>
+              <p className="text-2xl font-display text-primary italic">
+                {mounted ? <Counter value={trip.smoothnessScore} /> : trip.smoothnessScore}
+                <span className="text-xs font-body not-italic ml-1 opacity-40">/100</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="h-px w-full bg-white/5" />
+
+          {/* Secondary Stats Row */}
+          <div className="flex justify-between items-end">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
+                <span className="text-sm">{carEmoji || '🚗'}</span>
+              </div>
+              <div className="flex flex-col">
+                <p className="text-[9px] font-medium text-muted uppercase tracking-[0.1em]">Vehicle</p>
+                <p className="text-xs font-display text-text italic">{carName || 'The Prime Machine'}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[9px] font-medium text-muted uppercase tracking-[0.1em] mb-1">Status</p>
+              <span className="text-[10px] font-bold tracking-widest uppercase text-primary border border-primary/30 px-2 py-0.5 rounded-sm">
+                {scoreLabel.split(' ')[0]}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Spotify Overlay (Optional) */}
+        {spotifyTrack && (
+          <div className="mt-6 flex items-center gap-4 group/spotify">
+            <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-white/10 shadow-lg">
+              <img src={spotifyTrack.albumArt} alt="Album" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover/spotify:opacity-100 transition-opacity" />
+            </div>
+            <div className="flex flex-col">
+              <p className="text-[10px] font-bold text-text truncate max-w-[180px] uppercase tracking-tight">{spotifyTrack.name}</p>
+              <p className="text-[9px] text-muted truncate max-w-[180px] uppercase tracking-widest italic">{spotifyTrack.artist}</p>
+            </div>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent opacity-60" />
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-6 mb-6 z-10">
-        <div className="space-y-1">
-          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">DISTANCE</p>
-          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
-             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
-            {mounted ? <Counter value={trip.distance} precision={1} /> : trip.distance.toFixed(1)} <span className="text-[10px] opacity-60">KM</span>
-          </p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">DURATION</p>
-          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
-             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
-            {trip.duration || '0H 15M'}
-          </p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">TOP SPEED</p>
-          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
-             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
-            {mounted ? <Counter value={trip.topSpeed} /> : Math.round(trip.topSpeed)} <span className="text-[10px] opacity-60 text-pink-500">KM/H</span>
-          </p>
-        </div>
-        <div className="space-y-1">
-          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">SMOOTHNESS</p>
-          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
-             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
-            {mounted ? <Counter value={trip.smoothnessScore} /> : trip.smoothnessScore}/100
-          </p>
-        </div>
-      </div>
-
-      {/* Score Badge */}
-      <div className="mb-6 z-10">
-        <div className="inline-block border border-[var(--accent)] text-[var(--accent)] px-4 py-2 rounded-lg text-[10px] font-bold tracking-[0.2em] uppercase bg-[var(--accent)]/5">
-          {scoreLabel}
-        </div>
-      </div>
-
-      {/* Spotify Row */}
-      {spotifyTrack ? (
-        <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-2xl mb-6 z-10 backdrop-blur-sm">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={spotifyTrack.albumArt} alt="Album" className="w-10 h-10 rounded-lg shadow-lg" />
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black truncate uppercase tracking-tight">{spotifyTrack.name}</p>
-            <p className="text-[9px] text-gray-500 truncate uppercase tracking-widest">{spotifyTrack.artist}</p>
-          </div>
-          <span className="text-[var(--accent)] text-lg animate-pulse">♫</span>
-        </div>
-      ) : (
-        <div className="h-16 mb-6" /> // Spacer
-      )}
-
-      {/* AI Caption */}
-      <div className="flex-1 flex items-center justify-center text-center px-4 mb-6 z-10">
-        <p className="italic font-bold text-[10px] leading-relaxed opacity-90 text-[var(--text)] uppercase tracking-wider">
-          {trip.ai_caption || "Crunching your telemetry for the perfect flex..."}
+      {/* AI Caption Overlay (Shows on Hover or in Detail) */}
+      <div className="absolute inset-0 z-20 bg-[#0A0B0A]/90 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center p-12 text-center pointer-events-none">
+        <p className="font-display text-2xl text-text leading-relaxed italic">
+          "{trip.ai_caption || "A silent dialogue between driver and asphalt."}"
         </p>
       </div>
-
-      {/* Footer */}
-      <div className="flex justify-between items-center text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] z-10 mt-auto">
-        <div className="flex items-center gap-2">
-          <span className="text-sm">{carEmoji || '🚗'}</span>
-          <span className="truncate max-w-[120px] uppercase tracking-tight">{carName || 'MY RIDE'}</span>
-        </div>
-        <div className="opacity-40 tracking-normal">routeflex.app</div>
-      </div>
-
-      <style jsx>{`
-        @keyframes hue-rotate {
-          from { filter: hue-rotate(0deg); }
-          to { filter: hue-rotate(360deg); }
-        }
-        .animate-hue-rotate {
-          animation: hue-rotate 10s linear infinite;
-        }
-      `}</style>
     </div>
   )
 }

@@ -1,41 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import { 
-  Orbitron, 
-  Space_Mono, 
-  DM_Mono, 
-  Press_Start_2P, 
-  Courier_Prime 
+  Playfair_Display, 
+  Outfit 
 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const orbitron = Orbitron({ 
+const playfair = Playfair_Display({ 
   subsets: ["latin"], 
-  variable: "--font-orbitron" 
+  variable: "--font-display" 
 });
 
-const spaceMono = Space_Mono({ 
+const outfit = Outfit({ 
   subsets: ["latin"], 
-  weight: ["400", "700"], 
-  variable: "--font-space-mono" 
-});
-
-const dmMono = DM_Mono({ 
-  subsets: ["latin"], 
-  weight: ["400", "500"], 
-  variable: "--font-dm-mono" 
-});
-
-const pressStart2P = Press_Start_2P({ 
-  subsets: ["latin"], 
-  weight: "400", 
-  variable: "--font-press-start" 
-});
-
-const courierPrime = Courier_Prime({ 
-  subsets: ["latin"], 
-  weight: ["400", "700"], 
-  variable: "--font-courier" 
+  variable: "--font-body" 
 });
 
 export const metadata: Metadata = {
@@ -50,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050510",
+  themeColor: "#0A0B0A",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -66,19 +44,13 @@ export default function RootLayout({
     <html 
       lang="en" 
       className={cn(
-        "antialiased",
-        orbitron.variable,
-        spaceMono.variable,
-        dmMono.variable,
-        pressStart2P.variable,
-        courierPrime.variable
+        "antialiased dark",
+        playfair.variable,
+        outfit.variable
       )}
     >
       <head>
-        <link 
-          href="https://api.fontshare.com/v2/css?f[]=clash-display@400,600,700&display=swap" 
-          rel="stylesheet" 
-        />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body>
         {children}

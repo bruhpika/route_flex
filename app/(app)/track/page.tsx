@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useTripStore } from '@/store/tripStore'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default function TrackPage() {
   const router = useRouter()
@@ -72,74 +73,101 @@ export default function TrackPage() {
 
   if (gpsError) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#050505] text-white flex flex-col items-center justify-center p-8 text-center space-y-8">
-        <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
-          <span className="text-4xl">📍</span>
-        </div>
-        <div className="space-y-4">
-          <h1 className="text-3xl font-black font-[var(--font-orbitron)] tracking-tighter">GPS ACCESS DENIED</h1>
-          <p className="font-mono text-gray-500 text-sm max-w-xs mx-auto leading-relaxed uppercase tracking-widest">
-            Enable GPS in your browser settings to use RouteFlex tracking.
+      <div className="fixed inset-0 z-[100] bg-[#0A0B0A] text-text flex flex-col items-center justify-center p-12 text-center gap-12">
+        <div className="space-y-6">
+          <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase block">Navigation Error</span>
+          <h1 className="font-display text-5xl md:text-6xl text-text leading-tight max-w-lg">
+            The <span className="italic font-light text-muted">Horizon</span> is Missing.
+          </h1>
+          <p className="text-muted text-sm tracking-wide leading-relaxed max-w-sm mx-auto">
+            We require access to your physical location to calculate the geometry of your motion.
           </p>
         </div>
         <Button
           onClick={() => router.push('/dashboard')}
-          className="bg-white text-black font-black px-10 py-6 rounded-none hover:bg-gray-200 transition-all uppercase tracking-widest font-mono"
+          className="h-16 px-12 bg-primary text-black font-bold rounded-sm hover:bg-primary/90 transition-all text-xs tracking-[0.3em] uppercase"
         >
-          Back to Garage
+          Return to Archive
         </Button>
       </div>
     )
   }
 
-
   return (
-    <div className="fixed inset-0 z-[60] bg-[#050505] text-white flex flex-col p-8 select-none">
+    <div className="fixed inset-0 z-[60] bg-[#0A0B0A] text-text flex flex-col p-12 select-none overflow-hidden">
+      {/* Top Bar */}
       <div className="flex justify-between items-start pt-4">
-        <div className="space-y-1">
-          <p className="text-sm font-mono text-gray-500 uppercase tracking-widest">Distance</p>
-          <p className="text-4xl font-black font-[var(--font-orbitron)] text-[#00F5FF] tracking-tighter">
-            {(activeTrip?.distance || 0).toFixed(2)} <span className="text-[10px] text-gray-600 font-mono">KM</span>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-muted">Distance</span>
+            <div className="w-12 h-[1px] bg-white/10" />
+          </div>
+          <p className="font-display text-5xl md:text-6xl text-primary leading-none">
+            {(activeTrip?.distance || 0).toFixed(2)}
+            <span className="text-xs font-body italic ml-3 text-muted tracking-widest uppercase">km</span>
           </p>
         </div>
 
-        <div className="text-right space-y-1">
-          <div className="flex items-center justify-end gap-2">
-            <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_#22c55e]" />
-            <p className="text-[10px] font-mono text-green-500 uppercase tracking-widest font-bold">Tracking</p>
+        <div className="text-right space-y-4">
+          <div className="flex items-center justify-end gap-3">
+             <div className="flex items-center gap-2">
+               <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+               <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-primary">Live Session</span>
+             </div>
           </div>
-          <p className="text-2xl font-black font-[var(--font-orbitron)] text-white tracking-tighter">
+          <p className="font-display text-3xl md:text-4xl text-text leading-none italic font-light">
             {formatTime(timer)}
           </p>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center">
+      {/* Main Speedometer */}
+      <div className="flex-1 flex flex-col items-center justify-center relative">
         <div className="relative text-center">
           <motion.h1 
-            className="text-[140px] md:text-[200px] font-black font-[var(--font-orbitron)] leading-none text-white tracking-tighter"
+            className="font-display text-[160px] md:text-[240px] leading-none text-text tracking-tighter"
           >
             {roundedSpeed}
           </motion.h1>
-          <p className="text-3xl font-black font-[var(--font-space-mono)] text-gray-700 uppercase tracking-[0.8em] -mr-[0.8em] mt-[-10px]">
-            KM/H
-          </p>
+          <div className="flex flex-col items-center gap-2 mt-[-20px]">
+            <div className="w-32 h-[1px] bg-white/20" />
+            <p className="text-[10px] font-bold text-muted uppercase tracking-[0.8em] ml-[0.8em]">
+              Kilometers / Hour
+            </p>
+          </div>
           
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#00F5FF]/5 blur-[100px] -z-10 rounded-full" />
+          {/* Ambient Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/5 blur-[120px] -z-10 rounded-full" />
+        </div>
+
+        {/* Dynamic Accents */}
+        <div className="absolute inset-0 pointer-events-none opacity-5">
+           <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white" />
+           <div className="absolute left-1/2 top-0 h-full w-[1px] bg-white" />
         </div>
       </div>
 
-      <div className="pb-12 px-2">
-        <Button
-          onClick={handlePark}
-          className="w-full h-24 bg-red-600 hover:bg-red-700 text-white font-black text-3xl font-[var(--font-orbitron)] rounded-none shadow-[0_0_40px_rgba(220,38,38,0.2)] transition-all active:scale-95 uppercase tracking-tighter"
-        >
-          PARK 🅿️
-        </Button>
+      {/* Bottom Controls */}
+      <div className="pb-12 px-2 flex flex-col items-center gap-12">
+        <div className="w-full h-px bg-white/5" />
+        
+        <div className="flex flex-col items-center gap-8 w-full max-w-sm">
+          <p className="text-[9px] font-bold text-muted uppercase tracking-[0.4em] text-center max-w-[200px] leading-loose">
+            Finalize the drive and archive the telemetry.
+          </p>
+          <Button
+            onClick={handlePark}
+            className="w-full h-20 bg-transparent border border-white/20 hover:border-primary text-text hover:text-black font-bold rounded-sm transition-all group overflow-hidden relative"
+          >
+            <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            <span className="relative z-10 text-xs tracking-[0.3em] uppercase">Archive & Park</span>
+          </Button>
+        </div>
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-gray-800 text-[9px] font-mono tracking-[0.3em] uppercase pointer-events-none whitespace-nowrap opacity-50">
-        RouteFlex Real-Time Telemetry System
+      {/* Vertical Meta */}
+      <div className="absolute left-12 top-1/2 -translate-y-1/2 [writing-mode:vertical-lr] rotate-180 opacity-20 pointer-events-none">
+        <span className="text-[8px] font-bold uppercase tracking-[0.5em] text-text">RouteFlex Live Telemetry Engine — System V1.0.4</span>
       </div>
     </div>
   )

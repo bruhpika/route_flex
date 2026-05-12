@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Archive - Curateur</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Satoshi:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#edbc1d",
+          "background-light": "#f8f8f6",
+          "background-dark": "#221e10",
+          "text-alabaster": "#EAE8E3",
+          "text-muted": "#8C8D8A",
+          "glass-surface": "rgba(234, 232, 227, 0.04)",
+          "glass-border": "rgba(234, 232, 227, 0.1)",
+        },
+        fontFamily: {
+          "display": ["Playfair Display", "serif"],
+          "body": ["Satoshi", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        boxShadow: {
+          'glass': '0 24px 48px rgba(0, 0, 0, 0.4)',
+        }
+      },
+    },
+  }
+</script>
+<style>body {
+    font-family: "Satoshi", sans-serif;
+    background-color: #0A0B0A;
+    /* Simulated background content to demonstrate the glass effect */
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAzD4oU9Zi8cr_1AJG9vlvKYXSxqDG82pE9Cl-Xl7F_mTOob7jA6ECslWuvfEmAkUlU7edsMMFPP-88mPIbVkTenXuUDt6uK-GNNmQIyIVVTd9DYPOI3YXFOgLHPeCHiYgMhSkgeaKhL5Irjlc_fR4JPdKUc8sgMyxJ8SCFLkNrZfB6853OBYSr0KI2lZ91Q5heA-7V_ViOGXW3opkFlyR_gMESgo4aVahe9mzAaXUxkpER8oMjQxAlYc90G_ETOMozqNpuwJWZzm32);
+    background-size: cover;
+    background-position: center
+    }
+.glass-overlay {
+    background-color: rgba(10, 11, 10, 0.8);
+    backdrop-filter: blur(48px);
+    -webkit-backdrop-filter: blur(48px)
+    }
+.glass-pill {
+    background-color: rgba(234, 232, 227, 0.04);
+    border: 1px solid rgba(234, 232, 227, 0.1);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px)
+    }
+.search-input::placeholder {
+    color: #8C8D8A;
+    opacity: 1
+    }</style>
+</head>
+<body class="text-text-alabaster antialiased overflow-hidden selection:bg-primary selection:text-black">
+<div aria-label="Search the Archive" aria-modal="true" class="fixed inset-0 z-50 flex flex-col glass-overlay" role="dialog">
+<div class="absolute top-8 right-8 z-50">
+<button aria-label="Close search" class="group p-4 flex items-center justify-center transition-colors duration-300 hover:text-primary focus:outline-none">
+<span class="material-symbols-outlined text-4xl font-light">close</span>
+</button>
+</div>
+<div class="flex-1 flex flex-col justify-center max-w-5xl w-full mx-auto px-8 md:px-16 pt-20 pb-12">
+<div class="w-full relative mb-12 group">
+<input autocomplete="off" autofocus="" class="search-input w-full bg-transparent border-none outline-none font-display text-5xl md:text-[72px] leading-tight text-text-alabaster placeholder:text-text-muted focus:ring-0 p-0 caret-primary" placeholder="Search the archive..." spellcheck="false" type="text"/>
+<div class="absolute bottom-0 left-0 w-full h-[1px] bg-glass-border transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-700 origin-left"></div>
+</div>
+<div class="flex flex-wrap gap-3 mb-16">
+<button class="glass-pill rounded px-5 py-2.5 text-sm font-medium tracking-[0.1em] uppercase transition-all duration-300 hover:border-primary hover:text-primary focus:outline-none focus:border-primary">Art</button>
+<button class="glass-pill rounded px-5 py-2.5 text-sm font-medium tracking-[0.1em] uppercase transition-all duration-300 hover:border-primary hover:text-primary focus:outline-none focus:border-primary">Architecture</button>
+<button class="glass-pill rounded px-5 py-2.5 text-sm font-medium tracking-[0.1em] uppercase transition-all duration-300 hover:border-primary hover:text-primary focus:outline-none focus:border-primary">Fashion</button>
+<button class="glass-pill rounded px-5 py-2.5 text-sm font-medium tracking-[0.1em] uppercase transition-all duration-300 hover:border-primary hover:text-primary focus:outline-none focus:border-primary">Interviews</button>
+<button class="glass-pill rounded px-5 py-2.5 text-sm font-medium tracking-[0.1em] uppercase transition-all duration-300 hover:border-primary hover:text-primary focus:outline-none focus:border-primary">Editorials</button>
+</div>
+<div class="w-full relative min-h-[300px]">
+<div class="absolute inset-0 flex flex-col transition-opacity duration-500 opacity-100 pointer-events-auto" id="suggested-topics">
+<h3 class="text-text-muted text-sm font-medium tracking-[0.1em] uppercase mb-8">Suggested Topics</h3>
+<ul class="space-y-6">
+<li>
+<a class="group flex items-baseline gap-4 w-fit" href="#">
+<span class="font-display text-2xl md:text-3xl text-text-alabaster group-hover:text-primary transition-colors duration-300 italic">Brutalism in Tokyo</span>
+<span class="text-text-muted text-sm group-hover:text-primary/70 transition-colors duration-300">Architecture</span>
+</a>
+</li>
+<li>
+<a class="group flex items-baseline gap-4 w-fit" href="#">
+<span class="font-display text-2xl md:text-3xl text-text-alabaster group-hover:text-primary transition-colors duration-300">Avant-Garde Knitwear</span>
+<span class="text-text-muted text-sm group-hover:text-primary/70 transition-colors duration-300">Fashion</span>
+</a>
+</li>
+<li>
+<a class="group flex items-baseline gap-4 w-fit" href="#">
+<span class="font-display text-2xl md:text-3xl text-text-alabaster group-hover:text-primary transition-colors duration-300 italic">The Light of Tadao Ando</span>
+<span class="text-text-muted text-sm group-hover:text-primary/70 transition-colors duration-300">Editorial</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</body></html>

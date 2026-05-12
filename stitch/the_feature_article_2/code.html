@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Feature - Curateur</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;family=Satoshi:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#edbc1d",
+          "background-light": "#f8f8f6",
+          "background-dark": "#0A0B0A",
+          "surface-glass": "rgba(234, 232, 227, 0.04)",
+          "border-glass": "rgba(234, 232, 227, 0.08)",
+          "text-main": "#EAE8E3",
+          "text-muted": "#8C8D8A",
+        },
+        fontFamily: {
+          "display": ["Playfair Display", "serif"],
+          "body": ["Satoshi", "sans-serif"],
+        },
+        borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: theme('colors.background-dark');
+    color: theme('colors.text-main');
+    font-family: theme('fontFamily.body');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .glass-panel {
+    background-color: theme('colors.surface-glass');
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid theme('colors.border-glass');
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  .text-content p {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.8; /* 180% */
+    margin-bottom: 2rem;
+    color: theme('colors.text-main');
+    font-weight: 300;
+  }
+
+  .pull-quote {
+    font-family: theme('fontFamily.display');
+    font-size: 3rem; /* 48px */
+    color: theme('colors.primary');
+    font-style: italic;
+    line-height: 1.2;
+    margin: 4rem 0;
+    position: relative;
+  }
+
+  .pull-quote::before {
+    content: '"';
+    position: absolute;
+    left: -2rem;
+    top: -1rem;
+    font-size: 4rem;
+    opacity: 0.3;
+  }
+
+  .grid-break-img {
+    width: calc(100% + 120px);
+    margin-left: -120px;
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+  }
+
+  /* Progress Ring specific styles */
+  .progress-ring__circle {
+    transition: stroke-dashoffset 0.3s;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* Minimalist Header for "Focused Views" exception */
+  .minimal-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    padding: 2rem 4rem;
+    pointer-events: none;
+  }
+  .minimal-header > * {
+    pointer-events: auto;
+  }
+</style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-background-dark min-h-screen">
+<!-- Minimal Header (Back to Main) -->
+<header class="minimal-header flex justify-between items-center">
+<button aria-label="Go back" class="w-12 h-12 flex items-center justify-center rounded-full glass-panel hover:bg-white/10 transition-colors group cursor-pointer">
+<span class="material-symbols-outlined text-text-main group-hover:text-primary transition-colors">arrow_back</span>
+</button>
+<div class="text-sm tracking-[0.1em] uppercase font-medium text-text-muted">
+      The Feature
+    </div>
+</header>
+<main class="flex min-h-screen w-full relative">
+<!-- Left 40% - Sticky TOC -->
+<div class="hidden lg:block w-[40%] relative">
+<div class="sticky top-0 h-screen flex items-center pl-16 xl:pl-32 pr-8">
+<nav class="glass-panel w-[300px] rounded p-8 flex flex-col gap-12">
+<!-- Author & Progress -->
+<div class="flex items-center gap-4">
+<div class="relative w-16 h-16 flex-shrink-0">
+<!-- Progress Ring SVG -->
+<svg class="absolute inset-0 w-full h-full" viewbox="0 0 100 100">
+<circle class="text-white/10 stroke-current" cx="50" cy="50" fill="transparent" r="48" stroke-width="4"></circle>
+<!-- Inline stroke-dasharray and dashoffset for demo purposes (representing ~33% read) -->
+<circle class="progress-ring__circle text-primary stroke-current" cx="50" cy="50" fill="transparent" r="48" stroke-dasharray="301.59" stroke-dashoffset="200" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<!-- Author Avatar -->
+<div class="absolute inset-1 rounded-full overflow-hidden bg-background-dark">
+<img alt="Portrait of the author" class="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500" data-alt="A moody, high-contrast portrait of an elegant author set against a very dark, near-black background. The lighting is dramatic and directional, highlighting facial features while leaving the rest in deep shadow. The aesthetic is sophisticated, aligning perfectly with a premium, dark-mode editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzQyuRPpwRHEvFzNEXvpw4yn68K-nL4xL-8du5-G3V3KxXUSd59wZWw9ycfBhvkMXKsC2gISfaVO6BbtIDrgr-rOBZZg0CvbNyWvOgO4jx7MYq4sRhERxOHW_HdrlOdTKu44mh7Smh5cQBdAtmKBYwzXklkTIGSQY4ywRxKMPztHsZ_4HiEfEwqJePVV2CShSWdjTUfeeNNGyDPSxqoRl_N5Dsg1jxUcw2K2X2W1aw74ELzxA3cmmF49qE1pSYMB-4vWMKW5L7u4VQ"/>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-display italic text-lg text-text-main">Elena Varga</span>
+<span class="text-xs uppercase tracking-widest text-text-muted mt-1">12 Min Read</span>
+</div>
+</div>
+<!-- TOC Links -->
+<ul class="flex flex-col gap-6">
+<li class="group cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 shadow-[0_0_8px_rgba(237,188,29,0.6)]"></span>
+<span class="text-sm font-medium text-text-main tracking-wide group-hover:text-primary transition-colors">I. The Genesis</span>
+</div>
+</li>
+<li class="group cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent border border-text-muted flex-shrink-0 group-hover:border-primary transition-colors"></span>
+<span class="text-sm font-medium text-text-muted group-hover:text-text-main transition-colors">II. Form &amp; Function</span>
+</div>
+</li>
+<li class="group cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent border border-text-muted flex-shrink-0 group-hover:border-primary transition-colors"></span>
+<span class="text-sm font-medium text-text-muted group-hover:text-text-main transition-colors">III. The Aftermath</span>
+</div>
+</li>
+</ul>
+<!-- Tags -->
+<div class="pt-8 border-t border-border-glass">
+<div class="flex flex-wrap gap-2">
+<span class="text-[10px] uppercase tracking-widest text-text-muted px-2 py-1 rounded glass-panel">Architecture</span>
+<span class="text-[10px] uppercase tracking-widest text-text-muted px-2 py-1 rounded glass-panel">Brutalism</span>
+</div>
+</div>
+</nav>
+</div>
+</div>
+<!-- Right 60% - Scrolling Content -->
+<div class="w-full lg:w-[60%] py-32 px-6 lg:pr-32 xl:pr-48 flex justify-start">
+<article class="w-full max-w-[640px]">
+<!-- Article Header -->
+<header class="mb-16">
+<h1 class="font-display text-5xl md:text-7xl leading-tight text-text-main mb-6">
+            Concrete <i class="text-primary font-normal">Symphonies</i> in the Void
+          </h1>
+<p class="text-xl text-text-muted font-light leading-relaxed">
+            Exploring the emotional resonance of brutalist architecture in the digital age, where heavy forms meet ephemeral spaces.
+          </p>
+</header>
+<!-- Article Body -->
+<div class="text-content">
+<p>
+            The raw, unyielding nature of exposed concrete has long been a subject of polarizing debate. Born from the modernist ethos of truth to materials, brutalism emerged not merely as an architectural style, but as a philosophical statement. In an era increasingly defined by the intangible—where our experiences are mediated through smooth glass screens and frictionless digital interfaces—the sheer physical weight of these structures demands our attention.
+          </p>
+<p>
+            To walk among the towering geometric forms is to experience a profound sense of scale. The shadows cast by deep overhangs and angular recesses shift dramatically with the sun, transforming static buildings into dynamic sculptures. It is a slow, deliberate architecture that forces the observer into a state of contemplation.
+          </p>
+<!-- Grid Breaking Image -->
+<figure class="grid-break-img relative rounded overflow-hidden">
+<div class="aspect-w-16 aspect-h-10">
+<img alt="Abstract brutalist architecture" class="w-full h-full object-cover" data-alt="A striking, high-contrast architectural photograph of brutalist concrete forms. The composition is highly geometric and abstract, focusing on the interplay of harsh shadows and bright highlights on raw, textured concrete. The mood is solemn and imposing, aligning with a premium, dark-mode editorial aesthetic utilizing deep charcoal blacks and subtle warm grey tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn6bRNh1bdw9_-fry_Ld2E_5d0VUEM5N7VqL1I4Azeuky6fk2appxnblr4OwOw2YM2MU9dHOGG5DcvSlcnV0fgCnnMHHmccjDGStRTjeq16K6TuCYGr8ljZNUMckrehaFzzF7ikS-1922vaZ3EWaRMIZx7ZGlzNn7Hrc8ziJy-lfalyeVQYsQIt0fajuUbK-bzsD9pW-csfHHDZWB8XP0jeYmWgRxyrCBpwODFmaBZznHze9xnHchCcmJBYrWfot-85tSJmJKeVg50"/>
+</div>
+<figcaption class="mt-4 text-xs tracking-widest uppercase text-text-muted text-right">National Theatre, London. Photography by M. Davis.</figcaption>
+</figure>
+<p>
+            Yet, there is a fragility hidden within the massive walls. As weathering takes its toll, the concrete reveals its aggregate, telling the story of its creation. The streaks of water damage and patches of moss reintroduce nature to the severe geometries, creating a poignant contrast between human ambition and inevitable decay.
+          </p>
+<!-- Pull Quote -->
+<blockquote class="pull-quote">
+            "We build heavily to anchor ourselves in a world that feels increasingly weightless."
+          </blockquote>
+<p>
+            This brings us to the crux of their contemporary appeal. As we spend more of our lives in virtual spaces—environments completely devoid of texture, mass, or permanence—we feel an instinctual draw toward environments that are unapologetically real. The brutalist edifice offers no apologies. It simply exists, massive and silent, a testament to a specific moment in architectural history when the future seemed solid and graspable.
+          </p>
+<p>
+            The preservation of these monuments is fraught with challenges. Often viewed as eyesores by the public, many face demolition. However, a growing movement of curators, photographers, and historians are fighting to recontextualize them. By framing these structures not as oppressive monoliths, but as 'concrete symphonies', they invite a new generation to appreciate the austere beauty of form and shadow.
+          </p>
+<!-- Standard Image within grid -->
+<figure class="my-12 relative rounded overflow-hidden">
+<img alt="Interior concrete staircase" class="w-full h-auto" data-alt="An interior shot of a brutalist concrete staircase spiraling upwards. The lighting is moody and low-key, with a single shaft of light illuminating the textured concrete steps. The deep, almost black shadows contrast with the alabaster highlights, creating a sense of mystery and depth perfect for a sophisticated, dark editorial layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiq_vUIxtAsY5bXtdZONKQVl_5SfgOxTqOiLy8G_j5XTXuVtMd8XumxSfGsKWMsYcIcrpYfZ9VQ1DSwS1Qy7MzsSqxcpN7O5NzR8GuWwY361cv7H-f13HwYLM--a7u5bsZmvya-gOrqYc71oNpvISAyJvvmwbzSt9tMqieooHzjSyf8cZfZCKpipP7N1bEPhqYVjhAh4TQUwZBThcufxyAD1VLcsU1bQvt0vxkQxSegvHi8UdKAPLxCKYxXINKGigXfaznAIhwV9rt"/>
+</figure>
+<p>
+            Ultimately, the legacy of brutalism in the 21st century may not be strictly architectural. Instead, it serves as a crucial emotional counterweight to the ethereal nature of modern life. It reminds us that substance matters, that history leaves a physical mark, and that sometimes, beauty is found not in perfection, but in raw, unapologetic strength.
+          </p>
+</div>
+<!-- Footer / Next Article -->
+<footer class="mt-32 pt-16 border-t border-border-glass">
+<h3 class="text-xs uppercase tracking-[0.2em] text-text-muted mb-8">Continue Reading</h3>
+<a class="block group relative glass-panel rounded p-8 overflow-hidden hover:border-primary/50 transition-all duration-500" href="#">
+<!-- Background Image Hover Reveal -->
+<div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-700 bg-cover bg-center" data-alt="A moody, atmospheric shot of an avant-garde fashion exhibit. Silhouettes of angular garments are visible against a dimly lit, textured background. The color palette is strictly dark charcoal and muted gold accents, evoking a sense of high-end, exclusive editorial photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBBfXLCUpvAOB8PtgpzV0fE0KpDkboOpK6ehTavRJLHowDKZfSHHzFVdB1gXL53SB3fCwQ7HYEI01IgjLUeNpsvvlzlhNFpqFx2h1eR_MfFqWV9s04JXD5BY_NM9QZnQMxp9bII015N7PGCZHw7yNXcbi78ozEWavBk4TEwt3wJu_d4QjK6NOU9K_Opr4G7AN8bdqmGqjbDuteNH7tswyuxcaghTh28QGgHSo1WnGYVY1e8Cl5brXwFQbWxUJi1P2VjJTRGAxpPkOr0');"></div>
+<div class="relative z-10 flex flex-col items-start">
+<span class="text-xs uppercase tracking-widest text-primary mb-4">Fashion &amp; Form</span>
+<h4 class="font-display text-4xl text-text-main group-hover:text-white transition-colors mb-2">The Architecture of Cloth</h4>
+<p class="text-sm text-text-muted group-hover:text-text-main/80 transition-colors flex items-center gap-2">
+                Read Feature <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</p>
+</div>
+</a>
+</footer>
+</article>
+</div>
+</main>
+</body></html>

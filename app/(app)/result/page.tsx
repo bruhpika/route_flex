@@ -8,8 +8,7 @@ import { motion } from 'framer-motion'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { calculateSmoothnessScore } from '@/lib/smoothness'
 import { generateMapImageUrl } from '@/lib/mapbox'
-// Removed incorrect import
-import TemplateSwiper from '@/components/TemplateSwiper'
+import FlexCard from '@/components/FlexCard'
 import { useAuthStore } from '@/store/authStore'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
@@ -17,6 +16,7 @@ import { toast } from 'react-hot-toast'
 import confetti from 'canvas-confetti'
 import { Trip, SpotifyTrack } from '@/types'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 function ResultContent() {
   const searchParams = useSearchParams()
@@ -83,7 +83,6 @@ function ResultContent() {
       const smoothness = calculateSmoothnessScore(coords)
       const distance = coords.length > 0 ? (coords[coords.length-1].distance || 0) : 0
       
-      // Auto-detect tags
       let suggestedTag = 'commute'
       const startHour = new Date(startedAt).getHours()
       if (startHour >= 22 || startHour < 4) suggestedTag = 'midnight'
@@ -129,7 +128,7 @@ function ResultContent() {
       setTimeout(() => setLoading(false), 2500)
     } catch (err) {
       console.error(err)
-      setError('Telemetery processing failed. Check your connection.')
+      setError('Telemetery processing failed.')
       toast.error('Processing failed')
       setLoading(false)
     }
@@ -147,7 +146,7 @@ function ResultContent() {
       const canvas = await html2canvas(cardRef.current, { 
         useCORS: true, 
         scale: 2,
-        backgroundColor: '#050510'
+        backgroundColor: '#0A0B0A'
       })
       
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'))
@@ -174,7 +173,7 @@ function ResultContent() {
         particleCount: 150,
         spread: 70,
         origin: { y: 0.8 },
-        colors: ['#00F5FF', '#FF2D78', '#7B2FFF']
+        colors: ['#edbc1d', '#ffffff', '#333333']
       })
     } catch (err) {
       console.error(err)
@@ -183,11 +182,10 @@ function ResultContent() {
   }
 
   const TAGS = [
-    { emoji: '🏙️', label: 'Commute', value: 'commute' },
-    { emoji: '🛣️', label: 'Road Trip', value: 'road_trip' },
-    { emoji: '🌙', label: 'Midnight', value: 'midnight' },
-    { emoji: '🛒', label: 'Errand', value: 'errand' },
-    { emoji: '✏️', label: 'Custom', value: 'custom' }
+    { label: 'Commute', value: 'commute' },
+    { label: 'Road Trip', value: 'road_trip' },
+    { label: 'Midnight', value: 'midnight' },
+    { label: 'Errand', value: 'errand' }
   ]
 
   const updateTag = async (tag: string) => {
@@ -202,20 +200,33 @@ function ResultContent() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[70] bg-[#050510] flex items-center justify-center p-8">
-        <div className="space-y-8 text-center max-w-xs w-full">
+      <div className="fixed inset-0 z-[70] bg-[#0A0B0A] flex items-center justify-center p-12">
+        <div className="space-y-12 text-center max-w-md w-full">
           <div className="space-y-4">
-            <Skeleton className="w-full h-8 bg-white/5" />
-            <Skeleton className="w-3/4 h-8 bg-white/5 mx-auto" />
+            <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase block">Archiving Telemetry</span>
+            <h1 className="font-display text-4xl md:text-5xl text-text leading-tight italic">
+              Calculating <span className="font-light text-muted">Geometry</span>
+            </h1>
           </div>
-          <div className="w-full h-[2px] bg-white/5 overflow-hidden rounded-full">
+          
+          <div className="relative h-[1px] w-full bg-white/5 overflow-hidden">
              <motion.div 
                animate={{ x: ['-100%', '100%'] }}
-               transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-               className="w-full h-full bg-[#00F5FF] shadow-[0_0_15px_#00F5FF]"
+               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+               className="absolute top-0 left-0 w-full h-full bg-primary"
              />
           </div>
-          <p className="font-mono text-[10px] text-gray-500 uppercase tracking-[0.5em] animate-pulse">Analyzing Telemetry</p>
+
+          <div className="grid grid-cols-2 gap-8 pt-8 opacity-40">
+             <div className="text-left space-y-2">
+                <p className="text-[8px] uppercase tracking-widest font-bold">Signal Status</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-text">Calibrated</p>
+             </div>
+             <div className="text-right space-y-2">
+                <p className="text-[8px] uppercase tracking-widest font-bold">Processing Engine</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-text">V1.0.4 — Active</p>
+             </div>
+          </div>
         </div>
       </div>
     )
@@ -223,15 +234,15 @@ function ResultContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#050510] flex items-center justify-center p-8">
-        <div className="text-center space-y-6">
-          <div className="text-4xl">⚠️</div>
-          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">{error}</p>
+      <div className="min-h-screen bg-[#0A0B0A] flex items-center justify-center p-12">
+        <div className="text-center space-y-8">
+          <h1 className="font-display text-4xl italic text-text">Archive Unavailable.</h1>
+          <p className="text-muted text-sm tracking-widest uppercase">{error}</p>
           <Button 
             onClick={processTrip}
-            className="bg-[#FF2D78] text-white font-black rounded-none px-8 py-6"
+            className="bg-primary text-black font-bold h-16 px-12 rounded-sm"
           >
-            RETRY PROCESSING
+            Retry Archival
           </Button>
         </div>
       </div>
@@ -239,68 +250,91 @@ function ResultContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050510] pb-40">
-      <div className="max-w-md mx-auto px-6 pt-4 space-y-8">
+    <div className="min-h-screen bg-[#0A0B0A] pt-32 pb-48 px-8 md:px-16">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
         
-        <div className="flex items-center justify-between bg-[#0D0D1A] p-4 rounded-3xl border border-white/5 shadow-xl">
-           <div className="flex items-center gap-4">
-             <Switch 
-               checked={showRoute} 
-               onCheckedChange={(val) => {
-                 setShowRoute(val)
-                 setTrip((t) => t ? ({ ...t, mapUrl: generateMapImageUrl([], val) }) : null)
-               }} 
-             />
-             <span className="text-[10px] font-black font-mono text-gray-500 uppercase tracking-widest">
-               {showRoute ? 'Map Visible' : 'Map Hidden'}
-             </span>
-           </div>
-           
-           <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
-             <span className="text-[9px] font-black font-mono text-green-500 uppercase tracking-[0.2em]">Stored</span>
-           </div>
-        </div>
+        {/* Controls Section */}
+        <div className="flex flex-col gap-12 order-2 lg:order-1">
+          <div className="space-y-4">
+            <span className="text-primary text-[10px] font-bold tracking-[0.4em] uppercase block">Analysis Result</span>
+            <h1 className="font-display text-5xl md:text-7xl text-text leading-tight">
+              Motion <br />
+              <span className="italic font-light text-muted">Memorandum</span>
+            </h1>
+          </div>
 
-        {/* Trip Tags */}
-        <div className="overflow-x-auto no-scrollbar -mx-6 px-6">
-          <div className="flex gap-2 w-max pb-2">
-            {TAGS.map((tag) => (
-              <button
-                key={tag.value}
-                onClick={() => updateTag(tag.value)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-[10px] font-bold font-mono transition-all whitespace-nowrap uppercase tracking-widest ${
-                  trip?.trip_tag?.toLowerCase() === tag.value
-                  ? 'bg-[#00F5FF] border-[#00F5FF] text-black shadow-[0_0_15px_rgba(0,245,255,0.3)]'
-                  : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/20'
-                }`}
-              >
-                <span>{tag.emoji}</span>
-                <span>{tag.label}</span>
-              </button>
-            ))}
+          <div className="glass-panel p-10 space-y-10">
+            <div className="flex items-center justify-between border-b border-white/5 pb-8">
+               <div className="flex flex-col gap-1">
+                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold">Visual Render</p>
+                 <p className="text-[10px] font-bold text-text uppercase tracking-widest">
+                   {showRoute ? 'Satellite Geometry Active' : 'Hidden Map Surface'}
+                 </p>
+               </div>
+               <Switch 
+                 checked={showRoute} 
+                 onCheckedChange={(val) => {
+                   setShowRoute(val)
+                   setTrip((t) => t ? ({ ...t, mapUrl: generateMapImageUrl([], val) }) : null)
+                 }} 
+                 className="data-[state=checked]:bg-primary"
+               />
+            </div>
+
+            <div className="space-y-6">
+               <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold">Classification</p>
+               <div className="flex flex-wrap gap-4">
+                 {TAGS.map((tag) => (
+                   <button
+                     key={tag.value}
+                     onClick={() => updateTag(tag.value)}
+                     className={cn(
+                       "px-6 py-3 rounded-sm border text-[10px] font-bold transition-all uppercase tracking-widest",
+                       trip?.trip_tag?.toLowerCase() === tag.value
+                       ? 'bg-primary border-primary text-black'
+                       : 'bg-white/5 border-white/10 text-muted hover:border-white/20'
+                     )}
+                   >
+                     {tag.label}
+                   </button>
+                 ))}
+               </div>
+            </div>
+
+            <div className="pt-4">
+               <Button
+                 onClick={handleShare}
+                 className="w-full h-20 bg-primary text-black font-bold rounded-sm transition-all text-sm tracking-[0.3em] uppercase group overflow-hidden relative"
+               >
+                 <span className="relative z-10 flex items-center justify-center gap-3">
+                   <span className="material-symbols-outlined text-sm">share</span>
+                   Export to Gallery
+                 </span>
+               </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 opacity-40">
+             <div className="w-12 h-[1px] bg-white/20" />
+             <p className="text-[8px] uppercase tracking-[0.5em] text-text">End of Transmission</p>
           </div>
         </div>
 
-        {trip && (
-          <div ref={cardRef} className="flex justify-center">
-            <TemplateSwiper 
-              trip={trip}
-              spotifyTrack={spotifyTrack || undefined}
-              showRoute={showRoute}
-              carName={profile?.car_name || undefined}
-              carEmoji={profile?.car_emoji || undefined}
-            />
-          </div>
-        )}
-
-        <div className="fixed bottom-10 left-0 right-0 px-6 z-[80] flex justify-center pointer-events-none">
-           <Button
-             onClick={handleShare}
-             className="w-full max-w-xs h-20 bg-[#00F5FF] text-black font-black text-2xl font-[var(--font-orbitron)] rounded-full shadow-[0_20px_60px_rgba(0,245,255,0.4)] hover:scale-105 active:scale-95 transition-all pointer-events-auto border-4 border-black/10 uppercase"
-           >
-             Share Flex Card
-           </Button>
+        {/* Card Preview Section */}
+        <div className="flex items-center justify-center order-1 lg:order-2">
+          {trip && (
+            <div ref={cardRef} className="w-full max-w-[450px]">
+              <FlexCard 
+                trip={trip}
+                spotifyTrack={spotifyTrack || undefined}
+                showRoute={showRoute}
+                carName={profile?.car_name || undefined}
+                carEmoji={profile?.car_emoji || undefined}
+              />
+            </div>
+          )}
         </div>
+
       </div>
     </div>
   )
@@ -308,7 +342,7 @@ function ResultContent() {
 
 export default function ResultPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#050510]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0B0A]" />}>
       <ResultContent />
     </Suspense>
   )

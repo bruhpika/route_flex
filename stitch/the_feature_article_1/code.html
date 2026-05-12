@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Feature - Curateur</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Satoshi:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#edbc1d",
+          "background-light": "#f8f8f6",
+          "background-dark": "#0A0B0A",
+          "surface-glass": "rgba(234, 232, 227, 0.04)",
+          "border-glass": "rgba(234, 232, 227, 0.08)",
+          "text-main": "#EAE8E3",
+          "text-muted": "#8C8D8A",
+        },
+        fontFamily: {
+          "display": ["Playfair Display", "serif"],
+          "body": ["Satoshi", "sans-serif"],
+        },
+        borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: theme('colors.background-dark');
+    color: theme('colors.text-main');
+    font-family: theme('fontFamily.body');
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  .glass-panel {
+    background-color: theme('colors.surface-glass');
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid theme('colors.border-glass');
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Grid breaking utility for inline images */
+  .break-grid-left {
+    margin-left: -120px;
+    max-width: calc(100% + 120px);
+  }
+</style>
+</head>
+<body class="min-h-screen selection:bg-primary selection:text-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Minimal Header for Focused View (Back-to-Main Exception) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-10 py-6 mix-blend-difference">
+<a class="flex items-center gap-4 text-text-main hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="text-sm font-medium tracking-[0.1em] uppercase">The Index</span>
+</a>
+<div class="text-center">
+<h2 class="text-text-main text-lg font-bold tracking-widest uppercase">Curateur</h2>
+</div>
+<div class="w-24"></div> <!-- Spacer for flex balance -->
+</header>
+<div class="flex flex-col md:flex-row w-full pt-24 px-10 max-w-[1440px] mx-auto gap-16 pb-32">
+<!-- Left Column: Sticky Glass TOC (40%) -->
+<aside class="hidden md:block w-2/5 relative">
+<div class="sticky top-32 glass-panel rounded-DEFAULT p-8 w-[300px] flex flex-col gap-8">
+<!-- Author & Meta -->
+<div class="flex gap-4 items-center">
+<div class="relative size-12 rounded-full overflow-hidden border border-border-glass">
+<div class="absolute inset-0 border-2 border-primary rounded-full" style="clip-path: polygon(0 0, 100% 0, 100% 75%, 0 75%);"></div>
+<img alt="Author portrait" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuz2Y0sFrAiu3U6RybspfgiK6nikWzXvULIeWQYyB1grrK4xbJCIZugNG7P5kd_el7R5AbZudfinpatr-FXfIguOnzp1f5oXI1VEfTMs8GJr5sEOKUZGMtmDkMv2AdlyjheAgakGgnaM0tPdNITvp1aRwcSDQ30EhPC-Z01C2CuAyAfLX-k0tdC0Q-OXRfPAZu34Cf-nlXpKY4RGamos59xLZHjT-40-u5uWoBxK54l-8S_wwscWad2tyxWKAXvQxNkoiQsNKfHoxZ"/>
+</div>
+<div class="flex flex-col">
+<h3 class="text-text-main font-display text-lg">Elena Rostova</h3>
+<p class="text-text-muted text-xs tracking-widest uppercase mt-1">12 min read</p>
+</div>
+</div>
+<div class="h-[1px] w-full bg-border-glass"></div>
+<!-- Table of Contents -->
+<nav class="flex flex-col gap-4">
+<a class="group flex items-center gap-4" href="#intro">
+<div class="size-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(237,188,29,0.5)]"></div>
+<span class="text-primary text-sm tracking-[0.05em]">Introduction</span>
+</a>
+<a class="group flex items-center gap-4" href="#origin">
+<div class="size-1.5 rounded-full bg-border-glass group-hover:bg-text-muted transition-colors"></div>
+<span class="text-text-muted group-hover:text-text-main text-sm tracking-[0.05em] transition-colors">The Spatial Void</span>
+</a>
+<a class="group flex items-center gap-4" href="#modern">
+<div class="size-1.5 rounded-full bg-border-glass group-hover:bg-text-muted transition-colors"></div>
+<span class="text-text-muted group-hover:text-text-main text-sm tracking-[0.05em] transition-colors">Material Memory</span>
+</a>
+<a class="group flex items-center gap-4" href="#conclusion">
+<div class="size-1.5 rounded-full bg-border-glass group-hover:bg-text-muted transition-colors"></div>
+<span class="text-text-muted group-hover:text-text-main text-sm tracking-[0.05em] transition-colors">Conclusion</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Right Column: Scrolling Text (60%) -->
+<main class="w-full md:w-3/5 flex justify-start">
+<article class="max-w-[640px] w-full flex flex-col gap-12 text-lg font-light leading-[1.8] text-text-main">
+<!-- Hero Title Block -->
+<div class="flex flex-col gap-6 mb-8" id="intro">
+<span class="text-primary text-xs font-medium tracking-[0.2em] uppercase">Architecture &amp; Space</span>
+<h1 class="font-display text-6xl md:text-7xl leading-tight">
+            The Geometry of <span class="italic text-text-muted">Silence</span>
+</h1>
+<p class="text-xl text-text-muted font-display italic mt-4">
+            Exploring the Brutalist resurgence and the emotional resonance of empty spaces in modern urban environments.
+          </p>
+</div>
+<p>
+          There is a profound language spoken in the absence of form. In contemporary architectural discourse, the emphasis has steadily shifted from the ornamental to the elemental. We find ourselves drawn back to the raw, unforgiving textures of concrete, the stark intersections of light and shadow, and the deliberate void.
+        </p>
+<p>
+          This movement, often mischaracterized as merely a Brutalist revival, is something more introspective. It is an attempt to carve out sanctuaries of stillness amidst the relentless noise of the digital age. By stripping away the superfluous, architects are forcing us to confront the space itself, and by extension, our presence within it.
+        </p>
+<!-- Pull Quote -->
+<blockquote class="my-12 font-display text-4xl italic text-primary leading-snug text-center px-8 relative">
+<span class="absolute -top-4 -left-2 text-6xl opacity-20 material-symbols-outlined" data-icon="format_quote">format_quote</span>
+          "The intersection of art and architecture is not found in the grand gestures, but in the quiet spaces between them."
+        </blockquote>
+<p id="origin">
+          When observing the monolithic structures that dominate this new wave, one notices the obsessive attention to surface. The formwork marks left in cast concrete are not flaws; they are the fingerprints of construction, a narrative of the building's birth.
+        </p>
+<!-- Grid-Breaking Image -->
+<figure class="my-16 break-grid-left relative group">
+<div class="overflow-hidden rounded-DEFAULT">
+<img class="w-full h-auto object-cover transition-transform duration-[10s] group-hover:scale-105" data-alt="A striking architectural photograph of a brutalist concrete atrium. Harsh, angular shadows intersect with beams of bright, stark sunlight falling through unseen skylights. The concrete texture is highly detailed, raw, and porous. The mood is solemn, quiet, and monumental, capturing a dark-mode editorial aesthetic with deep blacks and high-contrast highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ15YrHAvUYg8a9u4LrMlOrh1xXiZTXmthwmIpvjAHmYIn4kSbKnRvHllcx1mf4lpkO61R9HEe52WswtdWdEyBdu91J3d_cvkH_HSMp5pzS3b2AcUvMSm8nVxCKaijEwoffcm8ICBGGTNclAeWJXhn-NuAjYCWctYc5ATklMnPIVetgMnRt48AELAXjURRblOa_CjzPy60jBFKrDnAZRzx67RnD8nJJj0Tqtq1n0ygNw2zxQ969g7aLrzBz824qNVjZB67W9OF4GsO"/>
+</div>
+<figcaption class="mt-4 text-xs text-text-muted tracking-widest uppercase flex justify-between">
+<span>Tate Modern Switch House, London</span>
+<span>Photography by H. Jensen</span>
+</figcaption>
+</figure>
+<p>
+          The light in these spaces behaves differently. It doesn't merely illuminate; it defines. As the sun traverses the sky, the interior geography shifts. A solid wall at noon becomes a canvas for sharp, elongated shadows by dusk. The architecture is not static; it performs.
+        </p>
+<p id="modern">
+          Critics argue that such spaces are cold, alienating, and devoid of human scale. Yet, this critique often misses the emotional capacity of scale itself. Stepping into a vast, unadorned concrete hall can induce a sense of awe akin to standing at the edge of a canyon. It diminishes the ego, offering a rare moment of humility.
+        </p>
+<div class="h-[1px] w-1/3 bg-border-glass my-12 mx-auto"></div>
+<p id="conclusion">
+          Ultimately, the geometry of silence is about creating containers for human experience rather than dictating it. By providing less visual noise, these structures invite more internal reflection. In a world saturated with ephemeral content, the enduring, silent weight of stone and concrete stands as a radical act of permanence.
+        </p>
+</article>
+</main>
+</div>
+</div>
+</body></html>

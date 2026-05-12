@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Curateur - The Index</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&amp;family=Satoshi:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#edbc1d",
+              "background-light": "#f8f8f6",
+              "background-dark": "#221e10",
+              "curateur-bg": "#0A0B0A",
+              "curateur-surface": "rgba(234, 232, 227, 0.04)",
+              "curateur-border": "rgba(234, 232, 227, 0.08)",
+              "curateur-text": "#EAE8E3",
+              "curateur-muted": "#8C8D8A",
+            },
+            fontFamily: {
+              "display": ["Playfair Display", "serif"],
+              "body": ["Satoshi", "sans-serif"],
+            },
+            borderRadius: {
+              "DEFAULT": "0.125rem",
+              "lg": "0.25rem",
+              "xl": "0.5rem",
+              "full": "0.75rem",
+              "sm": "2px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: var(--color-background, #0A0B0A);
+            color: var(--color-text, #EAE8E3);
+        }
+        
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 64px;
+        }
+        
+        @media (min-width: 768px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 64px;
+        }
+
+        .glass-panel {
+            background: rgba(234, 232, 227, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(234, 232, 227, 0.08);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+            transition: backdrop-filter 0.6s ease-out;
+        }
+
+        .article-card:hover .glass-panel {
+            backdrop-filter: blur(24px);
+        }
+
+        .article-card:hover .article-image {
+            transform: scale(1.05);
+        }
+
+        .article-card:hover .article-title {
+            color: #edbc1d;
+        }
+        
+        .article-image {
+            transition: transform 0.6s ease-out;
+        }
+
+        .article-title {
+            transition: color 0.6s ease-out;
+        }
+        
+        .bg-glass {
+            background: linear-gradient(to bottom, transparent, rgba(10, 11, 10, 0.8));
+        }
+    </style>
+</head>
+<body class="font-body text-[#EAE8E3] bg-[#0A0B0A] min-h-screen antialiased selection:bg-primary selection:text-black overflow-x-hidden">
+<!-- TopNavBar (Shared Component, Included because this is a Destination screen) -->
+<div class="relative flex h-auto w-full flex-col bg-[#0A0B0A] dark group/design-root overflow-x-hidden border-b border-white/10">
+<div class="layout-container flex h-full grow flex-col w-full">
+<header class="flex w-full items-center justify-between whitespace-nowrap px-8 lg:px-16 py-6">
+<div class="flex items-center gap-8">
+<a class="flex items-center gap-4 text-[#EAE8E3] hover:text-primary transition-colors" href="#">
+<div class="size-5">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-xl font-bold tracking-widest uppercase">CURATEUR</h2>
+</a>
+<div class="hidden md:flex items-center gap-12 ml-12">
+<a class="text-[#EAE8E3] text-sm font-medium tracking-[0.1em] uppercase hover:text-primary transition-colors" href="#">Editorial</a>
+<a class="text-[#EAE8E3] text-sm font-medium tracking-[0.1em] uppercase hover:text-primary transition-colors" href="#">Gallery</a>
+<a class="text-[#EAE8E3] text-sm font-medium tracking-[0.1em] uppercase hover:text-primary transition-colors" href="#">Archive</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<button class="text-[#EAE8E3] hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="text-sm font-medium tracking-[0.1em] uppercase hidden md:inline">Search</span>
+</button>
+<button class="text-[#EAE8E3] hover:text-primary transition-colors flex items-center gap-2 md:hidden">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+</button>
+</div>
+</header>
+</div>
+</div>
+<!-- Main Content -->
+<main class="w-full px-8 lg:px-16 py-24 mx-auto max-w-[1920px]">
+<!-- Section Header -->
+<div class="mb-24">
+<h1 class="font-display text-[64px] leading-tight text-[#EAE8E3] mb-8">The Index</h1>
+<div class="w-full h-px bg-[rgba(234,232,227,0.2)]"></div>
+</div>
+<!-- Masonry Grid -->
+<div class="masonry-grid w-full">
+<!-- Card 1 (600px) -->
+<article class="masonry-item article-card relative rounded-sm overflow-hidden group cursor-pointer h-[600px]">
+<div class="absolute inset-0 w-full h-full bg-neutral-900 rounded-sm overflow-hidden">
+<div class="w-full h-full bg-cover bg-center article-image" data-alt="A striking digital installation art piece featuring glowing, generative geometric shapes suspended in a vast, minimalist gallery space. The room is illuminated by high-key, soft white lighting that creates a bright, modern light-mode aesthetic. The artwork relies on a sophisticated palette of deep blacks and pristine whites, punctuated by intense accents of vibrant red. The mood is serene yet technologically advanced." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBVWaCgAavkm7o3W6clpu-QeLpX7j2sxB_RP6E1G4_6PT_6wl8QyUgDvu3NyaPwQQeeEb0rtGGl_zaC0evGXbv97LfoTUgvimwiUvvXISs7lQlGFfqXJY4qwuGYElyhky-gsZF27EzbjC__0E4wnX-fF7Dcc-dqUQKSRpDEvL3vZuDCuYkxWOzY1zzVhlRHO4ULZ1yzMu7tjpgLI8j5ukPL7YQj9b18kHd21FXAMBonMRJoSOFJ-94snWVbxNvm4VMGZrZ_xIVLFEhP');">
+</div>
+<div class="absolute inset-0 bg-glass opacity-60"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<div class="glass-panel w-full p-8 rounded-sm">
+<span class="block text-[#8C8D8A] text-xs uppercase tracking-[0.1em] mb-4 font-medium">Architecture</span>
+<h3 class="article-title font-display text-[32px] leading-tight text-[#EAE8E3]">The Brutalist Revival in Modern Urban Centers</h3>
+</div>
+</div>
+</article>
+<!-- Card 2 (800px) -->
+<article class="masonry-item article-card relative rounded-sm overflow-hidden group cursor-pointer h-[800px]">
+<div class="absolute inset-0 w-full h-full bg-neutral-900 rounded-sm overflow-hidden">
+<div class="w-full h-full bg-cover bg-center article-image" data-alt="A high-fashion editorial portrait shot in a dimly lit, avant-garde studio setting. The model wears structural, monochromatic garments that absorb the minimal spotlighting. Deep shadows dominate the composition, emphasizing the severe geometry of the clothing. The overall mood is mysterious, austere, and intensely focused, perfectly aligning with a dark-mode luxury aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCoB2ZKQ8wAL4eqUa3JK9zGXD4LrVaSWF6pDT9QHVI8j2JPnHHKiKFzzotMTK0OxEGJGjMcNCBCVYVtdw7T5e9xeYrUMP_T-D6_xw13yFaf3V5N1g7cVHnX0MmLKZaE1TnFl3C3rMGSrlxmL-zb0NKKX7TzaMk_k4bC2P24eXWbpGEiu3pi3IZd-UBA8fjkpwhREnDiPlAO9Ec3kdWFPbeKK0Sd1OZb0QVyBzzTvOWrZi7q2oGSGUFuZjtSwFs_D36ev4v1JcHLr7BD');">
+</div>
+<div class="absolute inset-0 bg-glass opacity-60"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<div class="glass-panel w-full p-8 rounded-sm">
+<span class="block text-[#8C8D8A] text-xs uppercase tracking-[0.1em] mb-4 font-medium">Fashion</span>
+<h3 class="article-title font-display text-[32px] leading-tight text-[#EAE8E3]">Shadows &amp; Silhouettes: A Study in Form</h3>
+</div>
+</div>
+</article>
+<!-- Card 3 (400px) -->
+<article class="masonry-item article-card relative rounded-sm overflow-hidden group cursor-pointer h-[400px]">
+<div class="absolute inset-0 w-full h-full bg-neutral-900 rounded-sm overflow-hidden">
+<div class="w-full h-full bg-cover bg-center article-image" data-alt="Abstract macro photography of fluid art, featuring swirling currents of deep charcoal, tarnished gold, and muted alabaster. The lighting is dramatic and directional, highlighting the textures and viscous flow of the medium. The aesthetic is organic yet highly controlled, conveying a sense of luxurious decay and moody elegance suitable for a high-end editorial background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAvOFopZjbBmLnZ8GqT2cTOno7wgIORXwFL7T2IbUjBhZ9C4ZW2B0yZ5fOX4emBf0gPSpbrIqKY4NJLJj7rO0WW0lhEO0vmk-VPkRUdH53iYLg8sfECqNSKUFfjSD3GS6wceFM9XkRXpYZAN7rWfHxEeBSbYzhazUN4u8gFPzke-Aicwi3H6XgXA3E88TB725wuKeRVe_eWPqDAw1zcV-LMontFgGj7B36f76_7usV8WpwAlpXtWhYpXuPMtpOrdTcM_1tJegiBOF83');">
+</div>
+<div class="absolute inset-0 bg-glass opacity-60"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<div class="glass-panel w-full p-8 rounded-sm">
+<span class="block text-[#8C8D8A] text-xs uppercase tracking-[0.1em] mb-4 font-medium">Art</span>
+<h3 class="article-title font-display text-[32px] leading-tight text-[#EAE8E3]">Fluid Dynamics</h3>
+</div>
+</div>
+</article>
+<!-- Card 4 (600px) -->
+<article class="masonry-item article-card relative rounded-sm overflow-hidden group cursor-pointer h-[600px]">
+<div class="absolute inset-0 w-full h-full bg-neutral-900 rounded-sm overflow-hidden">
+<div class="w-full h-full bg-cover bg-center article-image" data-alt="An expansive, minimally furnished interior space characterized by vast expanses of raw concrete and strategically placed minimalist furniture. A single shaft of dramatic natural light cuts through the darkness, illuminating a central sculptural chair. The scene is deeply atmospheric, emphasizing negative space and a severe, monochromatic palette accented only by subtle warm undertones in the light." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3QK_CfZdlmUDC2iDJ1cxUOSopPTEjssHG0O1RhFHlVt1bDbnuxKw3P9SuPDaLgXV0P3UukKinemdOpVXQsZVk-9FenHtiC05UzMdFrntnwfqyiranvuX-C5ebw5N7LcUOYGzbXSI49h3ZlOyTw4pX6IhkmSZYDDgxFG7ZGDtGcpep39SfZI6JJiSCJElOSxuWw6XpW4FJH2x2s6zUj3RyQ8QV6BdpkPBmeUz3qItOmVFb-xWf1qIeyiipF9urHfbhurykXretqXHC');">
+</div>
+<div class="absolute inset-0 bg-glass opacity-60"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<div class="glass-panel w-full p-8 rounded-sm">
+<span class="block text-[#8C8D8A] text-xs uppercase tracking-[0.1em] mb-4 font-medium">Interior</span>
+<h3 class="article-title font-display text-[32px] leading-tight text-[#EAE8E3]">The Void as Canvas</h3>
+</div>
+</div>
+</article>
+<!-- Card 5 (400px) -->
+<article class="masonry-item article-card relative rounded-sm overflow-hidden group cursor-pointer h-[400px]">
+<div class="absolute inset-0 w-full h-full bg-neutral-900 rounded-sm overflow-hidden">
+<div class="w-full h-full bg-cover bg-center article-image" data-alt="A close-up detail shot of intricate, sculptural jewelry resting against dark, textured stone. The gold of the jewelry catches a sharp, focused beam of light, creating brilliant highlights against the deep black background. The mood is opulent, intense, and highly detailed, perfectly capturing a moody, premium luxury product aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDz_dvNNFmaZ7IJGQt7SuNG4O4x2xuZauC1BMzALWqZy-wJgnYZBrUV8dEUrWYn3HUW1p28Vgpq83b-8RbbJYSDulSNH8UGXYkRTFqWE5J7LU2thzTKrEALGSyeSipzpGDI1dwSilJnPkUS0AHo6xtWg_XG8-NiY-6lOOTNiI9s5bnjcP9FYQvjL4ZXSYg2TK1P4dMyAPSJAgeqocqh-r7Fh-el1uJplGpr4gOMHP5NSAq2Dc_pD8RAbm8maC4BWon1r0Ch-V7kvAVf');">
+</div>
+<div class="absolute inset-0 bg-glass opacity-60"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<div class="glass-panel w-full p-8 rounded-sm">
+<span class="block text-[#8C8D8A] text-xs uppercase tracking-[0.1em] mb-4 font-medium">Design</span>
+<h3 class="article-title font-display text-[32px] leading-tight text-[#EAE8E3]">Heavy Metals</h3>
+</div>
+</div>
+</article>
+<!-- Card 6 (800px) -->
+<article class="masonry-item article-card relative rounded-sm overflow-hidden group cursor-pointer h-[800px]">
+<div class="absolute inset-0 w-full h-full bg-neutral-900 rounded-sm overflow-hidden">
+<div class="w-full h-full bg-cover bg-center article-image" data-alt="A sweeping, moody landscape photograph of a barren, misty coastal cliffside at twilight. The sky is a heavy, desaturated grey, and the jagged rocks below are lost in deep, inky shadows. A profound sense of isolation and raw natural power dominates the composition, offering a dark, expansive, and melancholic visual tone." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCdmQmqObabwNg0oDE6kME5nxnQECvCCw8_3KfEY7F_bDUhVGJbJ3Y3CbiZsUrjKmYAS60zW9im7cVl_VThWdgLu7tTIO3-9pyIIfbqmtQuG5WtubmQCsjACYSLDngx9YshKvOiBuR3nPZT1SrMyKYE9PsLxqvZ9kfsa4y3VrlYSeRptpnA05vsb95VQR_yTPUpl1BYDaYjXsyMJSEnuEr-ere831HO2NKgoYF7CwzJEAcd7vKzEhmQFzEMMcY95vTvTU6VfUFmH7gY');">
+</div>
+<div class="absolute inset-0 bg-glass opacity-60"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<div class="glass-panel w-full p-8 rounded-sm">
+<span class="block text-[#8C8D8A] text-xs uppercase tracking-[0.1em] mb-4 font-medium">Photography</span>
+<h3 class="article-title font-display text-[32px] leading-tight text-[#EAE8E3]">Edge of the World: Coastal Solitude</h3>
+</div>
+</div>
+</article>
+</div>
+</main>
+</body></html>

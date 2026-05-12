@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useTripStore } from '@/store/tripStore'
 import { useAuthStore } from '@/store/authStore'
@@ -13,12 +13,14 @@ import OnboardingModal from '@/components/OnboardingModal'
 import { toast } from 'react-hot-toast'
 import { Trip } from '@/types'
 import { Skeleton } from '@/components/ui/skeleton'
+import FlexCard from '@/components/FlexCard'
+import { cn } from '@/lib/utils'
 
 export default function Dashboard() {
   const router = useRouter()
   const { setStatus } = useTripStore()
   const { profile, setProfile, user } = useAuthStore()
-  const [recentTrip, setRecentTrip] = useState<Trip | null>(null)
+  const [trips, setTrips] = useState<Trip[]>([])
   const [loading, setLoading] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [spotifyConnected, setSpotifyConnected] = useState(false)
@@ -42,9 +44,7 @@ export default function Dashboard() {
 
         if (tripsRes.ok) {
           const tripsData = await tripsRes.json()
-          if (tripsData && tripsData.length > 0) {
-            setRecentTrip(tripsData[0])
-          }
+          setTrips(tripsData || [])
         }
 
         if (spotifyRes.ok) {
@@ -70,7 +70,7 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.error('WakeLock error:', err)
-      toast.error("Keep RouteFlex open while driving — iOS doesn't support background GPS")
+      toast.error("Keep RouteFlex open while driving")
     }
 
     setActiveTrip({
@@ -85,128 +85,135 @@ export default function Dashboard() {
     router.push('/track')
   }
 
-  const username = profile?.username || user?.user_metadata?.full_name || 'DRIVER'
+  const username = profile?.username || user?.user_metadata?.full_name?.split(' ')[0] || 'DRIVER'
 
   return (
-    <div className="max-w-md mx-auto px-6 py-8 space-y-12 pb-24">
+    <div className="min-h-screen bg-[#0A0B0A] pt-32 pb-24 px-8 md:px-16 selection:bg-primary selection:text-black">
       <OnboardingModal
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
       />
 
-      <div className="space-y-2">
-        <h2 className="text-sm font-mono text-gray-500 uppercase tracking-widest">Your Garage</h2>
-        <h1 className="text-3xl font-black font-[var(--font-orbitron)] text-white tracking-tighter uppercase">
-          WELCOME BACK, <span className="text-[#00F5FF]">{username}</span>
-        </h1>
-      </div>
-
-      <div className="relative h-56 bg-[#0D0D1A] border border-white/5 rounded-3xl flex flex-col items-center justify-center overflow-hidden shadow-2xl">
-        {loading ? (
-          <div className="flex flex-col items-center gap-4">
-            <Skeleton className="w-32 h-4 bg-white/5" />
-            <Skeleton className="w-48 h-12 bg-white/5" />
+      <div className="max-w-7xl mx-auto flex flex-col gap-20">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
+          <div className="space-y-4">
+            <span className="text-primary text-[10px] font-medium uppercase tracking-[0.4em] block">Personal Index</span>
+            <h1 className="font-display text-5xl md:text-7xl text-text leading-tight">
+              Welcome back, <br />
+              <span className="italic font-light text-muted">{username}</span>
+            </h1>
           </div>
-        ) : recentTrip ? (
-          <div className="text-center space-y-4">
-            <div className="inline-block bg-[#FF2D78]/20 text-[#FF2D78] px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-[#FF2D78]/30 uppercase">
-              Last Flex: {recentTrip.trip_tag || 'Commute'}
+
+          <div className="flex flex-col items-start md:items-end gap-6">
+            <div className="glass-panel p-6 flex items-center gap-8 w-full md:w-auto">
+               <div className="flex flex-col">
+                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold mb-1">Status</p>
+                 <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                   <p className="text-[10px] font-bold text-text uppercase tracking-widest">Active System</p>
+                 </div>
+               </div>
+               <div className="w-px h-8 bg-white/10" />
+               <div className="flex flex-col">
+                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold mb-1">Vehicle</p>
+                 <p className="text-[10px] font-bold text-text uppercase tracking-widest truncate max-w-[120px]">
+                   {profile?.car_name || 'Generic Unit'}
+                 </p>
+               </div>
             </div>
-            <p className="text-5xl font-black font-[var(--font-orbitron)] text-white tracking-tighter">
-              {recentTrip.distance.toFixed(1)} <span className="text-sm text-gray-500 font-mono">KM</span>
-            </p>
-            <button
-              onClick={() => router.push(`/result?id=${recentTrip.id}`)}
-              className="text-[10px] text-gray-500 hover:text-[#00F5FF] transition-colors font-mono uppercase tracking-widest underline decoration-[#00F5FF]/30"
-            >
-              View Result Card
-            </button>
-          </div>
-        ) : (
-          <div className="w-full flex flex-col items-center gap-6">
-            <div className="relative w-full h-16 overflow-hidden">
-              <motion.div
-                animate={{ x: ['-120%', '120%'] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                className="absolute flex items-center gap-4 whitespace-nowrap"
-              >
-                <span className="text-5xl">🏎️</span>
-                <div className="w-32 h-[2px] bg-gradient-to-r from-[#00F5FF] to-transparent opacity-40 shadow-[0_0_10px_#00F5FF]" />
-              </motion.div>
-            </div>
-            <p className="font-[var(--font-space-mono)] text-gray-500 text-xs text-center px-12 leading-loose tracking-widest uppercase">
-              Your first flex is<br />one drive away.
-            </p>
-          </div>
-        )}
-      </div>
 
-      <div className="flex justify-center pt-4">
-        <motion.div
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="w-full"
-        >
-          <Button
-            onClick={startEngine}
-            className="w-full h-28 bg-[#00F5FF] text-black font-black text-3xl font-[var(--font-orbitron)] rounded-none shadow-[0_0_40px_rgba(0,245,255,0.2)] hover:bg-[#00D1FF] hover:scale-[1.02] transition-all relative overflow-hidden group"
-          >
-            <span className="relative z-10 flex items-center gap-4">
-              START ENGINE 🔑
-            </span>
-            <div className="absolute inset-0 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500 skew-x-12" />
-          </Button>
-        </motion.div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4">
-        {/* Spotify Connection Card */}
-        <div className={`p-6 rounded-2xl border transition-all duration-300 flex items-center justify-between ${
-          spotifyConnected 
-          ? 'bg-[#1DB954]/5 border-[#1DB954]/20 shadow-[0_0_20px_rgba(29,185,84,0.05)]' 
-          : 'bg-[#0D0D1A] border-white/5'
-        }`}>
-          <div className="flex items-center gap-4">
-             <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
-               spotifyConnected ? 'bg-[#1DB954] text-black' : 'bg-white/5 text-gray-500'
-             }`}>
-               ♫
-             </div>
-             <div>
-                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-0.5">Music Sync</p>
-                <p className={`text-xs font-bold uppercase tracking-wider ${
-                  spotifyConnected ? 'text-[#1DB954]' : 'text-white/40'
-                }`}>
-                  {spotifyConnected ? 'Spotify Linked ✅' : 'Disconnected'}
-                </p>
-             </div>
-          </div>
-          {!spotifyConnected && (
-            <Button 
-              size="sm"
-              variant="outline"
-              onClick={() => window.location.href = '/api/auth/spotify'}
-              className="border-[#1DB954]/30 text-[#1DB954] hover:bg-[#1DB954] hover:text-black font-mono text-[9px] uppercase tracking-widest px-4 h-8 rounded-full"
+            <Button
+              onClick={startEngine}
+              className="h-16 px-12 bg-primary text-black font-bold rounded-sm hover:bg-primary/90 transition-all text-xs tracking-[0.3em] uppercase w-full md:w-auto group"
             >
-              Link Spotify
+              <span className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-sm">play_arrow</span>
+                Initialize Drive
+              </span>
             </Button>
-          )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
-            <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Status</p>
-            <p className="text-xs font-bold text-green-500 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              GPS READY
-            </p>
+        {/* Masonry / Grid Index */}
+        <div className="space-y-12">
+          <div className="flex items-center justify-between border-b border-white/5 pb-8">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.5em] text-muted">Aesthetic Journal — Trip Log</h2>
+            <div className="flex items-center gap-4">
+               <span className="text-[10px] font-medium text-text/40">{trips.length} Entries</span>
+               <div className="w-12 h-[1px] bg-white/10" />
+            </div>
           </div>
-          <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
-            <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Car</p>
-            <p className="text-xs font-bold text-white truncate">
-              {profile?.car_emoji || '🚗'} {profile?.car_name || 'SELECT CAR'}
-            </p>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="aspect-[3/4] rounded-sm bg-white/5 animate-pulse" />
+              ))}
+            </div>
+          ) : trips.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+              {trips.map((trip, index) => (
+                <motion.div 
+                  key={trip.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  onClick={() => router.push(`/result?id=${trip.id}`)}
+                >
+                  <FlexCard 
+                    trip={trip} 
+                    showRoute={true} 
+                    carName={profile?.car_name} 
+                    carEmoji={profile?.car_emoji} 
+                  />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-[400px] flex flex-col items-center justify-center border border-dashed border-white/5 rounded-sm">
+              <p className="font-display text-2xl italic text-muted mb-8">The archive is currently silent.</p>
+              <Button
+                onClick={startEngine}
+                variant="outline"
+                className="border-white/10 text-muted hover:text-text hover:border-primary transition-all text-[10px] tracking-widest uppercase font-bold"
+              >
+                Create First Entry
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Spotify Status Bar */}
+      <div className="fixed bottom-0 left-0 w-full z-40">
+        <div className={cn(
+          "px-8 py-3 flex items-center justify-between border-t border-white/5 transition-colors duration-700",
+          spotifyConnected ? "bg-[#1DB954]/5" : "bg-transparent"
+        )}>
+          <div className="flex items-center gap-6">
+            <span className={cn(
+              "text-[9px] font-bold tracking-[0.2em] uppercase",
+              spotifyConnected ? "text-[#1DB954]" : "text-muted"
+            )}>
+              {spotifyConnected ? "Auditory Telemetry Connected" : "Spotify Sync Offline"}
+            </span>
+            {spotifyConnected && (
+               <div className="flex items-center gap-2">
+                 <div className="w-1 h-1 bg-[#1DB954] rounded-full animate-pulse" />
+                 <div className="w-1 h-1 bg-[#1DB954] rounded-full animate-pulse delay-75" />
+                 <div className="w-1 h-1 bg-[#1DB954] rounded-full animate-pulse delay-150" />
+               </div>
+            )}
           </div>
+          {!spotifyConnected && (
+            <button 
+              onClick={() => window.location.href = '/api/auth/spotify'}
+              className="text-[9px] font-bold tracking-[0.2em] uppercase text-primary hover:underline"
+            >
+              Link Spotify
+            </button>
+          )}
         </div>
       </div>
     </div>

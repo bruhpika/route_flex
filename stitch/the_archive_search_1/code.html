@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Curateur - The Archive</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Satoshi:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#edbc1d",
+          "background-light": "#f8f8f6",
+          "background-dark": "#0a0b0a",
+          "text-main": "#eae8e3",
+          "text-muted": "#8c8d8a",
+          "glass-surface": "rgba(234, 232, 227, 0.04)",
+          "glass-border": "rgba(234, 232, 227, 0.08)",
+        },
+        fontFamily: {
+          "display": ["Playfair Display", "serif"],
+          "body": ["Satoshi", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+      },
+    },
+  }
+</script>
+<style>body {
+    font-family: "Satoshi", sans-serif;
+    background-color: #0a0b0a;
+    color: #eae8e3;
+    /* Placeholder background image to demonstrate the blur effect over content */
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcT1CHvN9S3XRwiaIFvMUhmq8R0g8oLx4_Q-J4fyHRttRkXExRJO513JPWsqxEhGDZmCAkAFfumhY9-QKeC_nlzYFYvoUU8E7JWFZ1EKF_CYARMZ3W3-u2pWDPERtHhQWNTQJRR940CCP80_XBwHWG0ICP21M7ZQkk98E8YVtaNpzVLwopoR4vF2AoJbd5B2L0Srbj3udEtATuwRv1Iiftx7ghZtnzcrqSDeMNx4g46htDGvP6xjh5oR9d4oGqU8qzgLR3UnSJiwjK);
+    background-size: cover;
+    background-position: center
+    }
+.glass-overlay {
+    background-color: rgba(10, 11, 10, 0.8);
+    backdrop-filter: blur(48px);
+    -webkit-backdrop-filter: blur(48px)
+    }
+.glass-pill {
+    background-color: var(--color-surface, rgba(234, 232, 227, 0.04));
+    border: 1px solid var(--color-border-glass, rgba(234, 232, 227, 0.08));
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px)
+    }
+/* Custom massive placeholder styling */
+input[type="text"]::placeholder {
+    color: #8c8d8a;
+    opacity: 1;
+    /* Firefox */
+    }
+/* Hide scrollbar for clean look */
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent
+    }</style>
+</head>
+<body class="antialiased min-h-screen relative overflow-hidden">
+<!-- The Archive Overlay -->
+<div class="fixed inset-0 z-50 flex flex-col glass-overlay px-8 md:px-24 py-12">
+<!-- Header / Close -->
+<div class="flex justify-end w-full mb-16">
+<button aria-label="Close Archive" class="w-12 h-12 flex items-center justify-center text-text-main hover:text-primary transition-colors duration-300 group focus:outline-none">
+<span class="material-symbols-outlined text-4xl font-light transform group-hover:rotate-90 transition-transform duration-500">close</span>
+</button>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col items-center justify-start w-full max-w-5xl mx-auto pt-10 md:pt-20">
+<!-- Search Input Section -->
+<div class="w-full text-center relative mb-12">
+<input autofocus="" class="w-full bg-transparent border-none outline-none focus:ring-0 text-center font-display italic text-5xl md:text-7xl text-text-main placeholder-text-muted transition-all duration-300" placeholder="Search the archive..." type="text"/>
+<!-- Subtle bottom line that expands on focus (simulated with CSS hover for now) -->
+<div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-px bg-primary opacity-50 transition-all duration-500 group-focus-within:w-1/2"></div>
+</div>
+<!-- Filter Tags Section -->
+<div class="flex flex-wrap justify-center gap-4 mb-24">
+<button class="glass-pill px-6 py-2 rounded-sm text-sm tracking-widest uppercase text-text-main hover:text-primary hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary">
+          Architecture
+        </button>
+<button class="glass-pill px-6 py-2 rounded-sm text-sm tracking-widest uppercase text-text-main hover:text-primary hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary">
+          Avant-Garde
+        </button>
+<button class="glass-pill px-6 py-2 rounded-sm text-sm tracking-widest uppercase text-primary border-primary/50 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary">
+          Fashion
+        </button>
+<button class="glass-pill px-6 py-2 rounded-sm text-sm tracking-widest uppercase text-text-main hover:text-primary hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary">
+          Interviews
+        </button>
+<button class="glass-pill px-6 py-2 rounded-sm text-sm tracking-widest uppercase text-text-main hover:text-primary hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary">
+          Photography
+        </button>
+</div>
+<!-- Suggested Topics / Results Area -->
+<div class="w-full max-w-2xl text-left animate-fade-in">
+<h3 class="font-display text-2xl text-text-muted mb-8 italic border-b border-glass-border pb-4">Suggested Topics</h3>
+<ul class="flex flex-col gap-6">
+<li>
+<a class="group flex items-baseline gap-4 w-full" href="#">
+<span class="text-text-muted text-sm font-light w-8">01</span>
+<span class="font-display text-3xl text-text-main group-hover:text-primary transition-colors duration-300">The Brutalist Revival in Kyoto</span>
+<span class="material-symbols-outlined text-text-muted opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 transition-all duration-300">arrow_forward</span>
+</a>
+</li>
+<li>
+<a class="group flex items-baseline gap-4 w-full" href="#">
+<span class="text-text-muted text-sm font-light w-8">02</span>
+<span class="font-display text-3xl text-text-main group-hover:text-primary transition-colors duration-300">Shadow Play: Yohji Yamamoto's Archive</span>
+<span class="material-symbols-outlined text-text-muted opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 transition-all duration-300">arrow_forward</span>
+</a>
+</li>
+<li>
+<a class="group flex items-baseline gap-4 w-full" href="#">
+<span class="text-text-muted text-sm font-light w-8">03</span>
+<span class="font-display text-3xl text-text-main group-hover:text-primary transition-colors duration-300">Conversations with Tadao Ando</span>
+<span class="material-symbols-outlined text-text-muted opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 transition-all duration-300">arrow_forward</span>
+</a>
+</li>
+<li>
+<a class="group flex items-baseline gap-4 w-full" href="#">
+<span class="text-text-muted text-sm font-light w-8">04</span>
+<span class="font-display text-3xl text-text-main group-hover:text-primary transition-colors duration-300">Minimalism Beyond the White Cube</span>
+<span class="material-symbols-outlined text-text-muted opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 transition-all duration-300">arrow_forward</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body></html>

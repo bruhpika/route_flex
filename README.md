@@ -88,6 +88,16 @@ The UI is inspired by **Brutalist Urbanism** and **Premium Editorial Design**, p
 
 ---
 
+## 🎨 Under the Hood: Flex Card Generation
+
+RouteFlex cards are built for high-end visual fidelity and seamless sharing. Unlike static images, they are fully interactive web components that leverage:
+
+- **React & Framer Motion**: Each card is a standard React component using `framer-motion` for smooth, cinematic animations like the slow-zoom map background and animated telemetry counters.
+- **Dynamic Map Compositing**: Route maps are generated via Mapbox imagery and processed through CSS filters (grayscale, high-contrast) to maintain the app's editorial aesthetic.
+- **High-Resolution Export**: When shared, the app uses `html2canvas` to perform a DOM-to-Canvas capture. It renders the card at **2x scale** for retina-quality PNG output, ensuring that glassmorphism and fine typography remain crisp.
+
+---
+
 ## 👨‍💻 Creator
 
 Created and maintained by **Harshith Bhardwaz**.

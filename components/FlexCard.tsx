@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
-
+import React, { useEffect, useState } from 'react'
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { getScoreLabel } from '@/lib/smoothness'
 import { Trip, SpotifyTrack } from '@/types'
 
@@ -14,14 +14,24 @@ interface FlexCardProps {
   carEmoji?: string
 }
 
+const Counter = ({ value, duration = 2, precision = 0 }: { value: number, duration?: number, precision?: number }) => {
+  const count = useMotionValue(0)
+  const rounded = useTransform(count, (latest) => latest.toFixed(precision))
+
+  useEffect(() => {
+    const controls = animate(count, value, { duration, ease: "easeOut" })
+    return controls.stop
+  }, [value, count, duration])
+
+  return <motion.span>{rounded}</motion.span>
+}
 
 const FlexCard = ({ trip, template, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
-  const stats = [
-    { label: 'DISTANCE', value: `${trip.distance.toFixed(1)} KM` },
-    { label: 'DURATION', value: trip.duration || '0H 15M' },
-    { label: 'TOP SPEED', value: `${Math.round(trip.topSpeed)} KM/H` },
-    { label: 'SMOOTHNESS', value: `${trip.smoothnessScore}/100` },
-  ]
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const scoreLabel = getScoreLabel(trip.smoothnessScore)
 
@@ -65,7 +75,7 @@ const FlexCard = ({ trip, template, spotifyTrack, carName, carEmoji }: FlexCardP
       </div>
 
       {/* Map */}
-      <div className="relative w-full h-[240px] rounded-2xl overflow-hidden mb-6 border border-white/5 z-10 bg-black">
+      <div className="relative w-full h-[220px] rounded-2xl overflow-hidden mb-6 border border-white/5 z-10 bg-black">
         {trip.mapUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img 
@@ -83,15 +93,34 @@ const FlexCard = ({ trip, template, spotifyTrack, carName, carEmoji }: FlexCardP
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-6 mb-6 z-10">
-        {stats.map((stat, i) => (
-          <div key={i} className="space-y-1">
-            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">{stat.label}</p>
-            <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
-               style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
-              {stat.value}
-            </p>
-          </div>
-        ))}
+        <div className="space-y-1">
+          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">DISTANCE</p>
+          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
+             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
+            {mounted ? <Counter value={trip.distance} precision={1} /> : trip.distance.toFixed(1)} <span className="text-[10px] opacity-60">KM</span>
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">DURATION</p>
+          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
+             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
+            {trip.duration || '0H 15M'}
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">TOP SPEED</p>
+          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
+             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
+            {mounted ? <Counter value={trip.topSpeed} /> : Math.round(trip.topSpeed)} <span className="text-[10px] opacity-60 text-pink-500">KM/H</span>
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60">SMOOTHNESS</p>
+          <p className="text-2xl font-black font-[var(--font-display)] text-[var(--primary)] tracking-tighter"
+             style={{ textShadow: template === 'cyberpunk' ? '0 0 15px var(--glow)' : 'none' }}>
+            {mounted ? <Counter value={trip.smoothnessScore} /> : trip.smoothnessScore}/100
+          </p>
+        </div>
       </div>
 
       {/* Score Badge */}
@@ -127,9 +156,9 @@ const FlexCard = ({ trip, template, spotifyTrack, carName, carEmoji }: FlexCardP
       <div className="flex justify-between items-center text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] z-10 mt-auto">
         <div className="flex items-center gap-2">
           <span className="text-sm">{carEmoji || '🚗'}</span>
-          <span className="truncate max-w-[120px]">{carName || 'MY RIDE'}</span>
+          <span className="truncate max-w-[120px] uppercase tracking-tight">{carName || 'MY RIDE'}</span>
         </div>
-        <div className="opacity-40">routeflex.app</div>
+        <div className="opacity-40 tracking-normal">routeflex.app</div>
       </div>
 
       <style jsx>{`

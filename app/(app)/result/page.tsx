@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { calculateSmoothnessScore } from '@/lib/smoothness'
 import { generateMapImageUrl } from '@/lib/mapbox'
-import { getRecentTrack } from '@/lib/spotify'
+// Removed incorrect import
 import TemplateSwiper from '@/components/TemplateSwiper'
 import { useAuthStore } from '@/store/authStore'
 import { Switch } from '@/components/ui/switch'
@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'react-hot-toast'
 import confetti from 'canvas-confetti'
 import { Trip, SpotifyTrack } from '@/types'
+import { Skeleton } from '@/components/ui/skeleton'
 
 function ResultContent() {
   const searchParams = useSearchParams()
@@ -24,98 +25,117 @@ function ResultContent() {
   const { profile } = useAuthStore()
 
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [trip, setTrip] = useState<Trip | null>(null)
   const [spotifyTrack, setSpotifyTrack] = useState<SpotifyTrack | null>(null)
   const [showRoute, setShowRoute] = useState(true)
 
   const cardRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const processTrip = async () => {
-      try {
-        let coords: any[] = []
-        let startedAt = Date.now()
-        let topSpeed = 0
-
-
-        if (!tripId) {
-          const storedCoords = sessionStorage.getItem('rf_coords')
-          const storedStarted = sessionStorage.getItem('rf_started_at')
-          
-          if (!storedCoords) {
-            router.push('/dashboard')
-            return
-          }
-          
-          coords = JSON.parse(storedCoords)
-          startedAt = parseInt(storedStarted || Date.now().toString())
-          
-          // topSpeed calculation
-          topSpeed = Math.max(...coords.map((c: any) => c.speed || 0), 0)
-        } else {
-
-          const res = await fetch(`/api/trips?id=${tripId}`)
-          if (res.ok) {
-            const data = await res.json()
-            setTrip({
-              ...data,
-              smoothnessScore: data.smoothness_score,
-              topSpeed: data.top_speed,
-              mapUrl: generateMapImageUrl([], true) // Mapbox lib will handle actual route
-            })
-            setLoading(false)
-            return
-          }
-        }
-
-        const smoothness = calculateSmoothnessScore(coords)
-        
-        const initialTrip = {
-          distance: coords.length > 0 ? (coords[coords.length-1].distance || 0) : 0,
-          topSpeed,
-          smoothnessScore: smoothness,
-          mapUrl: generateMapImageUrl(coords, true),
-          ai_caption: '',
-          trip_tag: 'COMMUTE'
-        }
-        setTrip(initialTrip)
-
-        // Parallel tasks
-        const [track, captionRes] = await Promise.all([
-          getRecentTrack(),
-          fetch('/api/generate-caption', {
-            method: 'POST',
-            body: JSON.stringify({ distance: initialTrip.distance, topSpeed, smoothness })
-          })
-        ])
-
-        setSpotifyTrack(track)
-        
-        if (captionRes.ok) {
-          const { caption } = await captionRes.json()
-          setTrip((t) => t ? ({ ...t, ai_caption: caption }) : null)
-        }
-
-        // Save trip
-        await fetch('/api/trips', {
-          method: 'POST',
-          body: JSON.stringify({
-            coords,
-            distance: initialTrip.distance,
-            top_speed: topSpeed,
-            smoothness_score: smoothness,
-            started_at: new Date(startedAt).toISOString(),
-          })
-        })
-
-        setTimeout(() => setLoading(false), 2500)
-      } catch (err) {
-        console.error(err)
-        toast.error('Processing failed')
-        setLoading(false)
+  const getRecentTrack = async () => {
+    try {
+      const res = await fetch('/api/spotify/recent')
+      if (res.ok) {
+        const data = await res.json()
+        return data.track
       }
+    } catch (err) {
+      console.error('Spotify fetch error:', err)
     }
+    return null
+  }
 
+  const processTrip = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      let coords: any[] = []
+      let startedAt = Date.now()
+      let topSpeed = 0
+
+      if (!tripId) {
+        const storedCoords = sessionStorage.getItem('rf_coords')
+        const storedStarted = sessionStorage.getItem('rf_started_at')
+        
+        if (!storedCoords) {
+          router.push('/dashboard')
+          return
+        }
+        
+        coords = JSON.parse(storedCoords)
+        startedAt = parseInt(storedStarted || Date.now().toString())
+        topSpeed = Math.max(...coords.map((c: any) => c.speed || 0), 0)
+      } else {
+        const res = await fetch(`/api/trips?id=${tripId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setTrip({
+            ...data,
+            smoothnessScore: data.smoothness_score,
+            topSpeed: data.top_speed,
+            mapUrl: generateMapImageUrl([], true)
+          })
+          setLoading(false)
+          return
+        }
+      }
+
+      const smoothness = calculateSmoothnessScore(coords)
+      const distance = coords.length > 0 ? (coords[coords.length-1].distance || 0) : 0
+      
+      // Auto-detect tags
+      let suggestedTag = 'commute'
+      const startHour = new Date(startedAt).getHours()
+      if (startHour >= 22 || startHour < 4) suggestedTag = 'midnight'
+      if (distance > 100) suggestedTag = 'road_trip'
+
+      const initialTrip = {
+        distance,
+        topSpeed,
+        smoothnessScore: smoothness,
+        mapUrl: generateMapImageUrl(coords, true),
+        ai_caption: '',
+        trip_tag: suggestedTag.toUpperCase()
+      }
+      setTrip(initialTrip)
+
+      const [track, captionRes] = await Promise.all([
+        getRecentTrack(),
+        fetch('/api/generate-caption', {
+          method: 'POST',
+          body: JSON.stringify({ distance: initialTrip.distance, topSpeed, smoothness })
+        })
+      ])
+
+      setSpotifyTrack(track)
+      
+      if (captionRes.ok) {
+        const { caption } = await captionRes.json()
+        setTrip((t) => t ? ({ ...t, ai_caption: caption }) : null)
+      }
+
+      await fetch('/api/trips', {
+        method: 'POST',
+        body: JSON.stringify({
+          coords,
+          distance: initialTrip.distance,
+          top_speed: topSpeed,
+          smoothness_score: smoothness,
+          started_at: new Date(startedAt).toISOString(),
+          trip_tag: suggestedTag.toUpperCase()
+        })
+      })
+
+      setTimeout(() => setLoading(false), 2500)
+    } catch (err) {
+      console.error(err)
+      setError('Telemetery processing failed. Check your connection.')
+      toast.error('Processing failed')
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     processTrip()
   }, [tripId, router])
 
@@ -158,7 +178,7 @@ function ResultContent() {
       })
     } catch (err) {
       console.error(err)
-      toast.error("Keep RouteFlex open while driving — iOS doesn't support background GPS")
+      toast.error("Share failed")
     }
   }
 
@@ -171,11 +191,11 @@ function ResultContent() {
   ]
 
   const updateTag = async (tag: string) => {
-    setTrip((t) => t ? ({ ...t, trip_tag: tag }) : null)
+    setTrip((t) => t ? ({ ...t, trip_tag: tag.toUpperCase() }) : null)
     if (trip?.id) {
       await fetch('/api/trips', {
         method: 'PATCH',
-        body: JSON.stringify({ id: trip.id, trip_tag: tag })
+        body: JSON.stringify({ id: trip.id, trip_tag: tag.toUpperCase() })
       })
     }
   }
@@ -183,35 +203,36 @@ function ResultContent() {
   if (loading) {
     return (
       <div className="fixed inset-0 z-[70] bg-[#050510] flex items-center justify-center p-8">
-        <div className="space-y-6 text-center">
-          <motion.div 
-            initial="hidden" animate="visible"
-            variants={{
-              visible: { transition: { staggerChildren: 0.05 } }
-            }}
-            className="flex justify-center"
-          >
-            {"CRUNCHING YOUR FLEX...".split("").map((char, i) => (
-              <motion.span
-                key={i}
-                variants={{
-                  hidden: { opacity: 0, y: 10 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-                className="text-2xl font-black font-[var(--font-orbitron)] text-[#00F5FF] tracking-tighter"
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            ))}
-          </motion.div>
-          <div className="w-48 h-[2px] bg-white/5 mx-auto overflow-hidden">
+        <div className="space-y-8 text-center max-w-xs w-full">
+          <div className="space-y-4">
+            <Skeleton className="w-full h-8 bg-white/5" />
+            <Skeleton className="w-3/4 h-8 bg-white/5 mx-auto" />
+          </div>
+          <div className="w-full h-[2px] bg-white/5 overflow-hidden rounded-full">
              <motion.div 
                animate={{ x: ['-100%', '100%'] }}
                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
                className="w-full h-full bg-[#00F5FF] shadow-[0_0_15px_#00F5FF]"
              />
           </div>
-          <p className="font-mono text-[10px] text-gray-600 uppercase tracking-[0.5em]">Analyzing Telemetry</p>
+          <p className="font-mono text-[10px] text-gray-500 uppercase tracking-[0.5em] animate-pulse">Analyzing Telemetry</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#050510] flex items-center justify-center p-8">
+        <div className="text-center space-y-6">
+          <div className="text-4xl">⚠️</div>
+          <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">{error}</p>
+          <Button 
+            onClick={processTrip}
+            className="bg-[#FF2D78] text-white font-black rounded-none px-8 py-6"
+          >
+            RETRY PROCESSING
+          </Button>
         </div>
       </div>
     )
@@ -248,7 +269,7 @@ function ResultContent() {
                 key={tag.value}
                 onClick={() => updateTag(tag.value)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full border text-[10px] font-bold font-mono transition-all whitespace-nowrap uppercase tracking-widest ${
-                  trip?.trip_tag === tag.value
+                  trip?.trip_tag?.toLowerCase() === tag.value
                   ? 'bg-[#00F5FF] border-[#00F5FF] text-black shadow-[0_0_15px_rgba(0,245,255,0.3)]'
                   : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/20'
                 }`}
@@ -272,30 +293,18 @@ function ResultContent() {
           </div>
         )}
 
-        {/* Spotify Connect */}
-        {!spotifyTrack && (
-          <Button
-            variant="outline"
-            onClick={() => window.location.href = '/api/auth/spotify'}
-            className="w-full border-white/10 bg-[#1DB954]/5 text-[#1DB954] font-mono text-[10px] font-bold uppercase tracking-[0.2em] py-8 rounded-2xl hover:bg-[#1DB954]/10 transition-all border-dashed"
-          >
-            <span className="mr-2">♫</span> Connect Spotify to add what you were listening to
-          </Button>
-        )}
-
         <div className="fixed bottom-10 left-0 right-0 px-6 z-[80] flex justify-center pointer-events-none">
            <Button
              onClick={handleShare}
-             className="w-full max-w-xs h-20 bg-[#00F5FF] text-black font-black text-2xl font-[var(--font-orbitron)] rounded-full shadow-[0_20px_60px_rgba(0,245,255,0.4)] hover:scale-105 active:scale-95 transition-all pointer-events-auto border-4 border-black/10"
+             className="w-full max-w-xs h-20 bg-[#00F5FF] text-black font-black text-2xl font-[var(--font-orbitron)] rounded-full shadow-[0_20px_60px_rgba(0,245,255,0.4)] hover:scale-105 active:scale-95 transition-all pointer-events-auto border-4 border-black/10 uppercase"
            >
-             SHARE FLEX 🔗
+             Share Flex Card
            </Button>
         </div>
       </div>
     </div>
   )
 }
-
 
 export default function ResultPage() {
   return (

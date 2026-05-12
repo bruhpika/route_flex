@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import OnboardingModal from '@/components/OnboardingModal'
 import { toast } from 'react-hot-toast'
 import { Trip } from '@/types'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -20,13 +21,15 @@ export default function Dashboard() {
   const [recentTrip, setRecentTrip] = useState<Trip | null>(null)
   const [loading, setLoading] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [spotifyConnected, setSpotifyConnected] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, tripsRes] = await Promise.all([
+        const [profileRes, tripsRes, spotifyRes] = await Promise.all([
           fetch('/api/profile'),
-          fetch('/api/trips')
+          fetch('/api/trips'),
+          fetch('/api/spotify/status')
         ])
 
         if (profileRes.ok) {
@@ -42,6 +45,11 @@ export default function Dashboard() {
           if (tripsData && tripsData.length > 0) {
             setRecentTrip(tripsData[0])
           }
+        }
+
+        if (spotifyRes.ok) {
+          const { connected } = await spotifyRes.json()
+          setSpotifyConnected(connected)
         }
       } catch (err) {
         console.error('Fetch error:', err)
@@ -80,7 +88,7 @@ export default function Dashboard() {
   const username = profile?.username || user?.user_metadata?.full_name || 'DRIVER'
 
   return (
-    <div className="max-w-md mx-auto px-6 py-8 space-y-12">
+    <div className="max-w-md mx-auto px-6 py-8 space-y-12 pb-24">
       <OnboardingModal
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
@@ -88,16 +96,16 @@ export default function Dashboard() {
 
       <div className="space-y-2">
         <h2 className="text-sm font-mono text-gray-500 uppercase tracking-widest">Your Garage</h2>
-        <h1 className="text-3xl font-black font-[var(--font-orbitron)] text-white tracking-tighter">
-          WELCOME BACK, <span className="text-[#00F5FF]">{username.toUpperCase()}</span>
+        <h1 className="text-3xl font-black font-[var(--font-orbitron)] text-white tracking-tighter uppercase">
+          WELCOME BACK, <span className="text-[#00F5FF]">{username}</span>
         </h1>
       </div>
 
       <div className="relative h-56 bg-[#0D0D1A] border border-white/5 rounded-3xl flex flex-col items-center justify-center overflow-hidden shadow-2xl">
         {loading ? (
-          <div className="animate-pulse flex flex-col items-center gap-4">
-            <div className="w-32 h-4 bg-white/10 rounded" />
-            <div className="w-48 h-12 bg-white/10 rounded" />
+          <div className="flex flex-col items-center gap-4">
+            <Skeleton className="w-32 h-4 bg-white/5" />
+            <Skeleton className="w-48 h-12 bg-white/5" />
           </div>
         ) : recentTrip ? (
           <div className="text-center space-y-4">
@@ -151,19 +159,54 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
-          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Status</p>
-          <p className="text-xs font-bold text-green-500 flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            GPS READY
-          </p>
+      <div className="grid grid-cols-1 gap-4">
+        {/* Spotify Connection Card */}
+        <div className={`p-6 rounded-2xl border transition-all duration-300 flex items-center justify-between ${
+          spotifyConnected 
+          ? 'bg-[#1DB954]/5 border-[#1DB954]/20 shadow-[0_0_20px_rgba(29,185,84,0.05)]' 
+          : 'bg-[#0D0D1A] border-white/5'
+        }`}>
+          <div className="flex items-center gap-4">
+             <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
+               spotifyConnected ? 'bg-[#1DB954] text-black' : 'bg-white/5 text-gray-500'
+             }`}>
+               ♫
+             </div>
+             <div>
+                <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-0.5">Music Sync</p>
+                <p className={`text-xs font-bold uppercase tracking-wider ${
+                  spotifyConnected ? 'text-[#1DB954]' : 'text-white/40'
+                }`}>
+                  {spotifyConnected ? 'Spotify Linked ✅' : 'Disconnected'}
+                </p>
+             </div>
+          </div>
+          {!spotifyConnected && (
+            <Button 
+              size="sm"
+              variant="outline"
+              onClick={() => window.location.href = '/api/auth/spotify'}
+              className="border-[#1DB954]/30 text-[#1DB954] hover:bg-[#1DB954] hover:text-black font-mono text-[9px] uppercase tracking-widest px-4 h-8 rounded-full"
+            >
+              Link Spotify
+            </Button>
+          )}
         </div>
-        <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
-          <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Car</p>
-          <p className="text-xs font-bold text-white truncate">
-            {profile?.car_emoji || '🚗'} {profile?.car_name || 'SELECT CAR'}
-          </p>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
+            <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Status</p>
+            <p className="text-xs font-bold text-green-500 flex items-center gap-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              GPS READY
+            </p>
+          </div>
+          <div className="p-4 bg-[#0D0D1A] border border-white/5 rounded-2xl">
+            <p className="text-gray-500 font-mono text-[10px] uppercase tracking-widest mb-1">Car</p>
+            <p className="text-xs font-bold text-white truncate">
+              {profile?.car_emoji || '🚗'} {profile?.car_name || 'SELECT CAR'}
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,77 +1,76 @@
-import Anthropic from '@anthropic-ai/sdk'
+import Groq from 'groq-sdk'
 import { NextRequest, NextResponse } from 'next/server'
 
-const client = new Anthropic()
+const client = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+})
 
 const FALLBACK_CAPTION = 'Another drive. Another flex. 🔥'
 
 interface CaptionRequestBody {
-  distance_km: number
-  top_speed_kmh: number
-  duration_secs: number
-  trip_tag: string
-  time_of_day: string
+  distance: number
+  topSpeed: number
+  smoothness: number
 }
 
 /**
  * POST /api/generate-caption
- * Body: { distance_km, top_speed_kmh, duration_secs, trip_tag, time_of_day }
+ * Body: { distance, topSpeed, smoothness }
  * Returns: { caption: string }
  */
 export async function POST(request: NextRequest) {
   try {
     const body: Partial<CaptionRequestBody> = await request.json()
 
-    const { distance_km, top_speed_kmh, duration_secs, trip_tag, time_of_day } = body
+    const { distance, topSpeed, smoothness } = body
 
     // Validate all required fields
     if (
-      distance_km === undefined ||
-      top_speed_kmh === undefined ||
-      duration_secs === undefined ||
-      !trip_tag ||
-      !time_of_day
+      distance === undefined ||
+      topSpeed === undefined ||
+      smoothness === undefined
     ) {
       return NextResponse.json(
         {
           error:
-            'Missing required fields: distance_km, top_speed_kmh, duration_secs, trip_tag, time_of_day',
+            'Missing required fields: distance, topSpeed, smoothness',
         },
         { status: 400 }
       )
     }
 
     try {
-      const message = await client.messages.create({
-        model: 'claude-sonnet-4-20250514',
+      const completion = await client.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 100,
-        system: `You are a hype caption generator for a driving app loved by Gen-Z.
-Generate ONE short, punchy, snarky or hype caption (max 12 words) based on the drive stats.
-Match the energy: fast drive = aggressive, midnight drive = mysterious, slow = self-deprecating.
-Never mention illegal speeds. Return only the caption text, no quotes.`,
         messages: [
           {
+            role: 'system',
+            content: `You are a hype caption generator for a driving app loved by Gen-Z.
+Generate ONE short, punchy, snarky or hype caption (max 12 words) based on the drive stats.
+Match the energy: fast drive = aggressive, slow = self-deprecating.
+Never mention illegal speeds. Return only the caption text, no quotes.`,
+          },
+          {
             role: 'user',
-            content: `Distance: ${distance_km}km, Top Speed: ${top_speed_kmh}km/h, Duration: ${duration_secs}s, Tag: ${trip_tag}, Time: ${time_of_day}`,
+            content: `Distance: ${distance}km, Top Speed: ${topSpeed}km/h, Smoothness: ${smoothness}/100`,
           },
         ],
       })
 
-      const caption =
-        message.content[0].type === 'text'
-          ? message.content[0].text.trim()
-          : FALLBACK_CAPTION
+      const caption = completion.choices[0]?.message?.content?.trim() || FALLBACK_CAPTION
 
       return NextResponse.json(
         { caption },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=31536000, max-age=31536000, stale-while-revalidate=86400',
+            'Cache-Control':
+              'public, s-maxage=31536000, max-age=31536000, stale-while-revalidate=86400',
           },
         }
       )
-    } catch (claudeError) {
-      console.error('[/api/generate-caption] Claude API error:', claudeError)
+    } catch (groqError) {
+      console.error('[/api/generate-caption] Groq API error:', groqError)
       // Graceful fallback — don't fail the entire trip save flow
       return NextResponse.json({ caption: FALLBACK_CAPTION })
     }

@@ -63,7 +63,7 @@ Storage:        Supabase Storage (for map snapshots)
 Mapping:        Mapbox GL JS + Mapbox Static Images API
 Card Export:    html2canvas → PNG → Web Share API / download
 Music:          Spotify Web API (OAuth 2.0 PKCE flow)
-AI Captions:    Claude API (claude-sonnet-4-20250514 via Anthropic SDK)
+AI Captions:    Groq API (llama-3.3-70b-versatile via Groq SDK)
 PWA:            next-pwa (service worker + manifest)
 Screen Lock:    Wake Lock API (navigator.wakeLock)
 Geolocation:    Browser Geolocation API (watchPosition)
@@ -322,7 +322,7 @@ Create a Next.js 14 project with TypeScript, Tailwind CSS, and Shadcn/ui initial
 Configure the following:
 
 1. Install dependencies: framer-motion, @supabase/supabase-js, @supabase/auth-helpers-nextjs, 
-   html2canvas, zustand, next-pwa, @anthropic-ai/sdk
+   html2canvas, zustand, next-pwa, groq-sdk
 
 2. Set up next-pwa in next.config.js with: 
    - dest: 'public'
@@ -440,7 +440,7 @@ Build the trip processing pipeline and the Flex Card generator for RouteFlex.
 
 1. Create /app/api/generate-caption/route.ts (Next.js API route):
    - Accept POST with body: { distance_km, top_speed_kmh, duration_secs, trip_tag, time_of_day }
-   - Call Anthropic Claude API (claude-sonnet-4-20250514) with this system prompt:
+   - Call Groq API (llama-3.3-70b-versatile) with this system prompt:
      "You are a hype caption generator for a driving app loved by Gen-Z. 
       Generate ONE short, punchy, snarky or hype caption (max 12 words) based on the drive stats. 
       Match the energy: fast drive = aggressive, midnight drive = mysterious, slow = self-deprecating.
@@ -592,8 +592,8 @@ SUPABASE_SERVICE_ROLE_KEY=
 # Mapbox
 NEXT_PUBLIC_MAPBOX_TOKEN=
 
-# Anthropic
-ANTHROPIC_API_KEY=
+# Groq
+GROQ_API_KEY=
 
 # Spotify
 SPOTIFY_CLIENT_ID=

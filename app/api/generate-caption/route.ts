@@ -62,7 +62,14 @@ Never mention illegal speeds. Return only the caption text, no quotes.`,
           ? message.content[0].text.trim()
           : FALLBACK_CAPTION
 
-      return NextResponse.json({ caption })
+      return NextResponse.json(
+        { caption },
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=31536000, max-age=31536000, stale-while-revalidate=86400',
+          },
+        }
+      )
     } catch (claudeError) {
       console.error('[/api/generate-caption] Claude API error:', claudeError)
       // Graceful fallback — don't fail the entire trip save flow

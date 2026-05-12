@@ -20,6 +20,15 @@ const Navbar = () => {
   const pathname = usePathname()
   const router = useRouter()
   const { user, setUser } = useAuthStore()
+  const [scrolled, setScrolled] = React.useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -40,13 +49,16 @@ const Navbar = () => {
 
   return (
     <header className={cn(
-      "fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 md:px-16 py-8 transition-all duration-500",
-      isLanding ? "bg-transparent" : "bg-transparent border-b border-white/5"
+      "fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 md:px-16 transition-all duration-700",
+      scrolled 
+        ? "bg-[#0A0B0A]/80 backdrop-blur-xl py-6 border-b border-white/5" 
+        : "bg-transparent py-8",
+      !isLanding && "border-b border-white/5"
     )}>
       {/* Left Navigation */}
       <nav className="hidden md:flex items-center gap-12">
         <Link 
-          href="/dashboard" 
+          href={isLanding ? "#philosophy" : "/dashboard"} 
           onMouseEnter={() => soundManager?.play('hover', 0.1)}
           onClick={() => soundManager?.play('click', 0.3)}
           className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors"
@@ -54,7 +66,7 @@ const Navbar = () => {
           Editorial
         </Link>
         <Link 
-          href="/dashboard" 
+          href={isLanding ? "#features" : "/dashboard"} 
           onMouseEnter={() => soundManager?.play('hover', 0.1)}
           onClick={() => soundManager?.play('click', 0.3)}
           className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors"

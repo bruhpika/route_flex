@@ -16,6 +16,7 @@ import { toast } from 'react-hot-toast'
 import confetti from 'canvas-confetti'
 import { Trip, SpotifyTrack } from '@/types'
 import { cn } from '@/lib/utils'
+import { soundManager } from '@/lib/sounds'
 
 function ResultContent() {
   const searchParams = useSearchParams()
@@ -75,6 +76,7 @@ function ResultContent() {
             mapUrl: generateMapImageUrl([], true)
           })
           setLoading(false)
+          soundManager?.play('archive', 0.5)
           return
         }
       }
@@ -124,7 +126,10 @@ function ResultContent() {
         })
       })
 
-      setTimeout(() => setLoading(false), 2500)
+      setTimeout(() => {
+        setLoading(false)
+        soundManager?.play('archive', 0.6)
+      }, 2500)
     } catch (err) {
       console.error(err)
       setError('Telemetery processing failed.')
@@ -138,6 +143,7 @@ function ResultContent() {
   }, [processTrip])
 
   const handleShare = async () => {
+    soundManager?.play('click', 0.4)
     if (!cardRef.current) return
     
     try {
@@ -188,6 +194,7 @@ function ResultContent() {
   ]
 
   const updateTag = async (tag: string) => {
+    soundManager?.play('click', 0.2)
     setTrip((t) => t ? ({ ...t, trip_tag: tag.toUpperCase() }) : null)
     if (trip?.id) {
       await fetch('/api/trips', {

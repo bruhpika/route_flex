@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
+import { soundManager } from '@/lib/sounds'
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -26,6 +27,7 @@ const Navbar = () => {
   }, [setUser])
 
   const handleSignOut = async () => {
+    soundManager?.play('click', 0.4)
     await supabase.auth.signOut()
     setUser(null)
     router.push('/')
@@ -42,17 +44,32 @@ const Navbar = () => {
     )}>
       {/* Left Navigation */}
       <nav className="hidden md:flex items-center gap-12">
-        <Link href="/dashboard" className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors">
+        <Link 
+          href="/dashboard" 
+          onMouseEnter={() => soundManager?.play('hover', 0.1)}
+          onClick={() => soundManager?.play('click', 0.3)}
+          className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors"
+        >
           Editorial
         </Link>
-        <Link href="/dashboard" className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors">
+        <Link 
+          href="/dashboard" 
+          onMouseEnter={() => soundManager?.play('hover', 0.1)}
+          onClick={() => soundManager?.play('click', 0.3)}
+          className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors"
+        >
           The Index
         </Link>
       </nav>
 
       {/* Center Logo */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <Link href="/" className="group flex items-center gap-3">
+        <Link 
+          href="/" 
+          onMouseEnter={() => soundManager?.play('hover', 0.15)}
+          onClick={() => soundManager?.play('click', 0.4)}
+          className="group flex items-center gap-3"
+        >
           <h1 className="font-display text-xl md:text-2xl font-bold tracking-[0.3em] uppercase text-text">
             ROUTE <span className="italic font-light">FLEX</span>
           </h1>

@@ -55,12 +55,11 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
-    // Use service role client for the write (bypasses RLS)
-    const serviceSupabase = getServiceSupabase()
-
-    const { data, error } = await serviceSupabase
+    // Use the authenticated client for the write (respects RLS)
+    // RLS policy "Users own their profile" allows all operations where auth.uid() = id
+    const { data, error } = await supabase
       .from('profiles')
-      .upsert({ 
+      .upsert({
         id: user.id,
         ...updateFields,
         updated_at: new Date().toISOString()
@@ -73,7 +72,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ profile: data })
+    return NextResponse.json(data)
   } catch (err) {
     console.error('[PATCH /api/profile] unexpected error', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -103,10 +102,14 @@ export async function GET() {
       .single()
 
     if (error) {
+      // Handle the case where no profile exists yet
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(null)
+      }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ profile: data })
+    return NextResponse.json(data)
   } catch (err) {
     console.error('[GET /api/profile] unexpected error', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

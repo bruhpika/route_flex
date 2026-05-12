@@ -5,9 +5,11 @@ export const dynamic = 'force-dynamic'
 import { motion, Variants } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
+import { soundManager } from '@/lib/sounds'
 
 export default function LandingPage() {
   const handleSignIn = async () => {
+    soundManager?.play('startup', 0.6)
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -78,6 +80,7 @@ export default function LandingPage() {
         <motion.div variants={item} className="flex flex-col items-center gap-8">
           <Button
             onClick={handleSignIn}
+            onMouseEnter={() => soundManager?.play('hover', 0.2)}
             className="group relative h-16 px-12 bg-transparent border border-white/20 hover:border-primary transition-all duration-700 overflow-hidden rounded-sm"
           >
             <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16, 1, 0.3, 1]" />

@@ -14,6 +14,7 @@ import { toast } from 'react-hot-toast'
 import { Trip } from '@/types'
 import FlexCard from '@/components/FlexCard'
 import { cn } from '@/lib/utils'
+import { soundManager } from '@/lib/sounds'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -36,9 +37,13 @@ export default function Dashboard() {
         if (profileRes.ok) {
           const profileData = await profileRes.json()
           setProfile(profileData)
-          if (!profileData.car_name) {
+          // Show onboarding if profile doesn't exist or is incomplete
+          if (!profileData || !profileData.car_name) {
             setShowOnboarding(true)
           }
+        } else if (profileRes.status === 404 || profileRes.status === 500) {
+          // Fallback for missing profile
+          setShowOnboarding(true)
         }
 
         if (tripsRes.ok) {
@@ -62,6 +67,7 @@ export default function Dashboard() {
 
   const startEngine = async () => {
     const { setActiveTrip } = useTripStore.getState()
+    soundManager?.play('startup', 0.5)
 
     try {
       if ('wakeLock' in navigator) {
@@ -158,7 +164,11 @@ export default function Dashboard() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  onClick={() => router.push(`/result?id=${trip.id}`)}
+                  onMouseEnter={() => soundManager?.play('hover', 0.15)}
+                  onClick={() => {
+                    soundManager?.play('click', 0.3)
+                    router.push(`/result?id=${trip.id}`)
+                  }}
                 >
                   <FlexCard 
                     trip={trip} 

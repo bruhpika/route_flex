@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     const { access_token, expires_in } = await tokenResponse.json()
 
-    const response = NextResponse.redirect(new URL('/result', request.url))
+    const response = NextResponse.redirect(new URL('/dashboard', request.url))
 
     // Store access_token in session cookie (httpOnly, expires with Spotify token ~1h)
     response.cookies.set('spotify_access_token', access_token, {

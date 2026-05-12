@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import { useTripStore } from '@/store/tripStore'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { soundManager } from '@/lib/sounds'
 
 export default function TrackPage() {
   const router = useRouter()
@@ -15,6 +17,7 @@ export default function TrackPage() {
   const [gpsError, setGpsError] = useState(false)
   
   useEffect(() => {
+    soundManager?.play('startup', 0.4)
     if (!navigator.geolocation) {
       setGpsError(true)
       return
@@ -62,6 +65,7 @@ export default function TrackPage() {
   }
 
   const handlePark = () => {
+    soundManager?.play('click', 0.5)
     if (activeTrip) {
       sessionStorage.setItem('rf_coords', JSON.stringify(activeTrip.coords))
       sessionStorage.setItem('rf_started_at', activeTrip.startedAt.toString())

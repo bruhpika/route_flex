@@ -29,8 +29,31 @@ function ResultContent() {
   const [trip, setTrip] = useState<Trip | null>(null)
   const [spotifyTrack, setSpotifyTrack] = useState<SpotifyTrack | null>(null)
   const [showRoute, setShowRoute] = useState(true)
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file.')
+      return
+    }
+    // Revoke any previous object URL to free memory
+    if (customImageUrl) URL.revokeObjectURL(customImageUrl)
+    const objectUrl = URL.createObjectURL(file)
+    setCustomImageUrl(objectUrl)
+    toast.success('Background updated!', { icon: '📷' })
+    soundManager?.play('click', 0.3)
+  }
+
+  const handleRemoveImage = () => {
+    if (customImageUrl) URL.revokeObjectURL(customImageUrl)
+    setCustomImageUrl(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const getRecentTrack = async () => {
     try {
@@ -308,6 +331,40 @@ function ResultContent() {
             </div>
 
             <div className="pt-4">
+               {/* Hidden file input */}
+               <input
+                 ref={fileInputRef}
+                 type="file"
+                 accept="image/*"
+                 className="hidden"
+                 onChange={handleImageUpload}
+               />
+
+               {/* Custom image controls */}
+               <div className="space-y-3 mb-6">
+                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold">Card Background</p>
+                 <div className="flex gap-3">
+                   <button
+                     onClick={() => fileInputRef.current?.click()}
+                     className="flex-1 h-10 border border-white/10 hover:border-primary text-muted hover:text-text rounded-sm transition-all text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                   >
+                     <span>📷</span>
+                     {customImageUrl ? 'Change Photo' : 'Upload Photo'}
+                   </button>
+                   {customImageUrl && (
+                     <button
+                       onClick={handleRemoveImage}
+                       className="h-10 px-4 border border-white/10 hover:border-red-500/50 text-muted hover:text-red-400 rounded-sm transition-all text-[9px] font-bold uppercase tracking-widest"
+                     >
+                       ✕ Remove
+                     </button>
+                   )}
+                 </div>
+                 {customImageUrl && (
+                   <p className="text-[8px] text-primary/60 tracking-wide italic">Custom photo active — card uses your image as background.</p>
+                 )}
+               </div>
+
                <Button
                  onClick={handleShare}
                  className="w-full h-20 bg-primary text-black font-bold rounded-sm transition-all text-sm tracking-[0.3em] uppercase group overflow-hidden relative"
@@ -317,7 +374,7 @@ function ResultContent() {
                    Export to Gallery
                  </span>
                </Button>
-            </div>
+             </div>
           </div>
 
           <div className="flex items-center gap-6 opacity-40">
@@ -336,6 +393,7 @@ function ResultContent() {
                 showRoute={showRoute}
                 carName={profile?.car_name || undefined}
                 carEmoji={profile?.car_emoji || undefined}
+                customImageUrl={customImageUrl || undefined}
               />
             </div>
           )}

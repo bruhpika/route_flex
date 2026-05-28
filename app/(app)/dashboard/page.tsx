@@ -83,7 +83,8 @@ export default function Dashboard() {
       coords: [],
       distance: 0,
       topSpeed: 0,
-      currentSpeed: 0
+      currentSpeed: 0,
+      totalPausedMs: 0
     })
 
     setStatus('tracking')
@@ -143,9 +144,14 @@ export default function Dashboard() {
         {/* Masonry / Grid Index */}
         <div className="space-y-12">
           <div className="flex items-center justify-between border-b border-white/5 pb-8">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.5em] text-muted">Aesthetic Journal — Trip Log</h2>
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.5em] text-muted">Recent Trips</h2>
             <div className="flex items-center gap-4">
-               <span className="text-[10px] font-medium text-text/40">{trips.length} Entries</span>
+               <button
+                 onClick={() => router.push('/trips')}
+                 className="text-[9px] font-bold uppercase tracking-widest text-primary hover:underline transition-all"
+               >
+                 View All {trips.length > 0 ? `(${trips.length})` : ''} →
+               </button>
                <div className="w-12 h-[1px] bg-white/10" />
             </div>
           </div>
@@ -157,27 +163,40 @@ export default function Dashboard() {
               ))}
             </div>
           ) : trips.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-              {trips.map((trip, index) => (
-                <motion.div 
-                  key={trip.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  onMouseEnter={() => soundManager?.play('hover', 0.15)}
-                  onClick={() => {
-                    soundManager?.play('click', 0.3)
-                    router.push(`/result?id=${trip.id}`)
-                  }}
-                >
-                  <FlexCard 
-                    trip={trip} 
-                    showRoute={true} 
-                    carName={profile?.car_name || undefined} 
-                    carEmoji={profile?.car_emoji || undefined} 
-                  />
-                </motion.div>
-              ))}
+            <div className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+                {trips.slice(0, 3).map((trip, index) => (
+                  <motion.div 
+                    key={trip.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    onMouseEnter={() => soundManager?.play('hover', 0.15)}
+                    onClick={() => {
+                      soundManager?.play('click', 0.3)
+                      router.push(`/result?id=${trip.id}`)
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <FlexCard 
+                      trip={trip} 
+                      showRoute={true} 
+                      carName={profile?.car_name || undefined} 
+                      carEmoji={profile?.car_emoji || undefined} 
+                    />
+                  </motion.div>
+                ))}
+              </div>
+              {trips.length > 3 && (
+                <div className="flex justify-center pt-4">
+                  <button
+                    onClick={() => router.push('/trips')}
+                    className="h-12 px-10 border border-white/10 text-muted hover:text-text hover:border-primary rounded-sm transition-all text-[9px] font-bold uppercase tracking-widest"
+                  >
+                    View All {trips.length} Trips →
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="h-[400px] flex flex-col items-center justify-center border border-dashed border-white/5 rounded-sm">

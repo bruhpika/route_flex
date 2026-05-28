@@ -2,12 +2,33 @@
 
 export const dynamic = 'force-dynamic'
 
-import { motion, Variants } from 'framer-motion'
+import { useState } from 'react'
+import { motion, Variants, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { soundManager } from '@/lib/sounds'
+import FlexCard from '@/components/FlexCard'
+import { Trip } from '@/types'
+
+// Static demo trip data for the homepage showcase
+const DEMO_TRIP: Trip = {
+  distance: 42.7,
+  topSpeed: 112,
+  smoothnessScore: 87,
+  trip_tag: 'MIDNIGHT',
+  ai_caption: "30km of asphalt poetry. Traffic didn't stand a chance tonight.",
+  startedAt: Date.now(),
+}
+
+const TEMPLATES = [
+  { key: 'cyberpunk', label: 'Cyberpunk', color: '#00F5FF' },
+  { key: 'minimal', label: 'Minimal', color: '#C8FF00' },
+  { key: 'y2k', label: 'Y2K', color: '#FF6EC7' },
+]
 
 export default function LandingPage() {
+  const [selectedTemplate, setSelectedTemplate] = useState('cyberpunk')
+
   const handleSignIn = async () => {
     soundManager?.play('startup', 0.6)
     await supabase.auth.signInWithOAuth({
@@ -195,6 +216,86 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Example Output Section ── */}
+      <section id="example" className="py-32 px-8 md:px-16 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+
+          {/* Left: copy */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="space-y-10 order-2 lg:order-1"
+          >
+            <div className="space-y-4">
+              <span className="text-primary text-[10px] font-bold uppercase tracking-[0.4em]">02 / Output</span>
+              <h2 className="font-display text-5xl md:text-7xl leading-tight">
+                This is your <br /><span className="italic font-light text-muted">Flex Card.</span>
+              </h2>
+              <p className="text-muted text-lg leading-relaxed max-w-md">
+                Every drive generates a shareable card packed with your telemetry. Three curated templates — pick the one that matches your energy.
+              </p>
+            </div>
+
+            {/* Template switcher pills */}
+            <div className="flex flex-wrap gap-3">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => setSelectedTemplate(t.key)}
+                  style={selectedTemplate === t.key ? { borderColor: t.color, color: t.color, backgroundColor: `${t.color}15` } : {}}
+                  className={`px-5 py-2.5 rounded-sm border text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 ${
+                    selectedTemplate === t.key
+                      ? 'shadow-[0_0_20px_rgba(255,255,255,0.1)]'
+                      : 'border-white/10 text-muted hover:border-white/30 hover:text-text'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-6">
+              <div className="w-12 h-[1px] bg-white/20" />
+              <span className="text-[10px] font-bold tracking-widest uppercase text-text/40">Tap a template to preview</span>
+            </div>
+          </motion.div>
+
+          {/* Right: live demo card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2 }}
+            className="flex justify-center order-1 lg:order-2"
+          >
+            <div className="w-full max-w-[360px] relative">
+              {/* Glow effect behind card */}
+              <div className="absolute inset-0 bg-primary/10 blur-[60px] -z-10 rounded-full scale-75" />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedTemplate}
+                  initial={{ opacity: 0, scale: 0.96, filter: 'blur(8px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.96, filter: 'blur(8px)' }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <FlexCard
+                    trip={DEMO_TRIP}
+                    template={selectedTemplate}
+                    showRoute={false}
+                    carName="2023 Honda City"
+                    carEmoji="🚗"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </motion.div>
+
         </div>
       </section>
 

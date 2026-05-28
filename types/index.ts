@@ -4,6 +4,7 @@ export interface Trip {
   topSpeed: number
   smoothnessScore: number
   mapUrl?: string
+  customImageUrl?: string  // user-uploaded background image (object URL or Supabase Storage URL)
   ai_caption?: string
   trip_tag?: string
   coords?: any[]

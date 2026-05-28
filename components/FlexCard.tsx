@@ -13,6 +13,7 @@ interface FlexCardProps {
   spotifyTrack?: SpotifyTrack
   carName?: string
   carEmoji?: string
+  customImageUrl?: string  // user-uploaded image overrides the map
 }
 
 const Counter = ({ value, duration = 2, precision = 0 }: { value: number, duration?: number, precision?: number }) => {
@@ -27,7 +28,7 @@ const Counter = ({ value, duration = 2, precision = 0 }: { value: number, durati
   return <motion.span>{rounded}</motion.span>
 }
 
-const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
+const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl }: FlexCardProps) => {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -35,12 +36,14 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
   }, [])
 
   const scoreLabel = getScoreLabel(trip.smoothnessScore)
+  // Custom image takes priority over the Mapbox map URL
+  const backgroundUrl = customImageUrl || trip.customImageUrl || trip.mapUrl
 
   return (
     <div className="relative aspect-[3/4] w-full max-w-[500px] bg-[#0A0B0A] overflow-hidden rounded-sm group cursor-pointer border border-white/5 shadow-2xl">
-      {/* Background Map with Slow Zoom */}
+      {/* Background Map / Custom Photo with Slow Zoom */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {trip.mapUrl ? (
+        {backgroundUrl ? (
           <motion.div
             initial={{ scale: 1 }}
             animate={{ scale: 1.1 }}
@@ -48,11 +51,12 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
             className="w-full h-full relative"
           >
             <Image 
-              src={trip.mapUrl} 
-              alt="Route Map" 
+              src={backgroundUrl} 
+              alt={customImageUrl || trip.customImageUrl ? 'Custom Photo' : 'Route Map'}
               fill
               className="object-cover grayscale brightness-50 contrast-125"
               sizes="500px"
+              unoptimized={!!(customImageUrl || trip.customImageUrl)} // object URLs bypass next/image optimizer
             />
           </motion.div>
         ) : (
@@ -73,8 +77,15 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji }: FlexCardProps) => {
               The <span className="italic font-light">Geometry</span> of Motion
             </h3>
           </div>
-          <div className="glass-pill px-3 py-1 text-[10px] font-bold tracking-widest text-text/60 uppercase">
-            {new Date(trip.startedAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+          <div className="flex flex-col items-end gap-2">
+            <div className="glass-pill px-3 py-1 text-[10px] font-bold tracking-widest text-text/60 uppercase">
+              {new Date(trip.startedAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </div>
+            {(customImageUrl || trip.customImageUrl) && (
+              <div className="glass-pill px-2 py-0.5 text-[8px] font-bold tracking-widest text-primary/80 uppercase">
+                📷 Custom
+              </div>
+            )}
           </div>
         </div>
 

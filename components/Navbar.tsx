@@ -63,15 +63,15 @@ const Navbar = () => {
           onClick={() => soundManager?.play('click', 0.3)}
           className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors"
         >
-          Editorial
+          {isLanding ? "Editorial" : "Dashboard"}
         </Link>
         <Link 
-          href={isLanding ? "#features" : "/dashboard"} 
+          href={isLanding ? "#features" : "/trips"} 
           onMouseEnter={() => soundManager?.play('hover', 0.1)}
           onClick={() => soundManager?.play('click', 0.3)}
           className="text-[10px] font-medium tracking-[0.2em] uppercase text-text/60 hover:text-primary transition-colors"
         >
-          The Index
+          {isLanding ? "The Index" : "Trips"}
         </Link>
       </nav>
 

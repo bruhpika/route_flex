@@ -14,6 +14,7 @@ interface FlexCardProps {
   carName?: string
   carEmoji?: string
   customImageUrl?: string  // user-uploaded image overrides the map
+  userNickname?: string
 }
 
 const Counter = ({ value, duration = 2, precision = 0 }: { value: number, duration?: number, precision?: number }) => {
@@ -28,7 +29,7 @@ const Counter = ({ value, duration = 2, precision = 0 }: { value: number, durati
   return <motion.span>{rounded}</motion.span>
 }
 
-const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl }: FlexCardProps) => {
+const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl, userNickname }: FlexCardProps) => {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -67,6 +68,18 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl }: Fle
 
       {/* Content Overlay */}
       <div className="absolute inset-0 z-10 flex flex-col p-8 md:p-12">
+        {/* Top Branding & Nickname */}
+        <div className="flex justify-between items-center mb-6">
+          <span className="font-display font-bold tracking-[0.3em] text-xs text-text uppercase">
+            ROUTE <span className="italic font-light">FLEX</span>
+          </span>
+          {userNickname && (
+            <span className="text-[10px] font-bold tracking-widest text-primary/80 uppercase">
+              @{userNickname}
+            </span>
+          )}
+        </div>
+
         {/* Header */}
         <div className="flex justify-between items-start mb-auto">
           <div className="flex flex-col gap-1">

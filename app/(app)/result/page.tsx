@@ -394,6 +394,7 @@ function ResultContent() {
                 carName={profile?.car_name || undefined}
                 carEmoji={profile?.car_emoji || undefined}
                 customImageUrl={customImageUrl || undefined}
+                userNickname={profile?.username || undefined}
               />
             </div>
           )}

@@ -15,9 +15,10 @@ All new UI components, state management changes, and routing decisions regarding
 - **Smoothness Score Breakdown Tooltip**: Refactored `calculateSmoothnessScore` to return `accelVariance`, `hardBrakes`, and `lateralG`. Added a glass-panel hover tooltip over the Smoothness score in the card.
 - **Template Accent Customization**: Added 4 swatches + hex input. Setting `style={{ '--primary': accentColor }}` at the root level overrides the Tailwind CSS variable dynamically.
 
+- **Drive History Dashboard (Motion Memorandum)**: Converted `/dashboard` to act as the primary index, listing past drives using a grid of `FlexCard`s.
+- **Drive Streak Counter**: Displays the dynamic streak and total accumulated distance at the top of the dashboard.
+
 ## V1 Frontend Features (PENDING)
-- **Drive History Dashboard (Motion Memorandum)**: View past drives, stats, templates, and one-tap reshare (Web Share API).
-- **Drive Streak Counter**: Badge on card and history dashboard showing consecutive days.
 
 ## V2 Frontend Features (PENDING)
 - **Passenger Co-Crediting (Hype Crew)**: End-of-trip driver QR code. Passenger app scanner.

@@ -20,10 +20,14 @@ last_updated_by: "Gemini 3 Flash"
   NEXT BLOCKER: None
 - [T-106] Feature: Template Accent Customization - Frontend UI accent color picker (presets + hex) — DONE
   NEXT BLOCKER: None
-- [T-107] Feature: Drive History Dashboard (Motion Memorandum) - Backend API for fetching trip history — PENDING
-- [T-108] Feature: Drive History Dashboard (Motion Memorandum) - Frontend UI listing past drives and Web Share API integration — PENDING
-- [T-109] Feature: Drive Streak Counter - Backend logic/DB to track consecutive days — PENDING
-- [T-110] Feature: Drive Streak Counter - Frontend UI badge on card and history dashboard — PENDING
+- [T-107] Feature: Drive History Dashboard (Motion Memorandum) - Backend API for fetching trip history — DONE
+  NEXT BLOCKER: None
+- [T-108] Feature: Drive History Dashboard (Motion Memorandum) - Frontend UI listing past drives and Web Share API integration — DONE
+  NEXT BLOCKER: None
+- [T-109] Feature: Drive Streak Counter - Backend logic/DB to track consecutive days — DONE
+  NEXT BLOCKER: None
+- [T-110] Feature: Drive Streak Counter - Frontend UI badge on card and history dashboard — DONE
+  NEXT BLOCKER: None
 
 ### V2 — First Post-Launch Drop
 

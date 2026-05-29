@@ -15,9 +15,10 @@ All new API schema additions and backend decisions regarding V1/V2 features will
 - **Smoothness Score Breakdown Tooltip**: Added `smoothness_details` (JSONB) column to the `trips` table to store `accelVariance`, `hardBrakes`, and `lateralG`.
 - **Template Accent Customization**: Added `accent_color` (String) column to the `trips` table to persist custom hex colors.
 
+- **Drive History Dashboard**: Created `GET /api/dashboard` which returns user's trips, sorted descending.
+- **Drive Streak Counter**: Added dynamic on-the-fly streak calculation logic in `/api/dashboard`.
+
 ## V1 Backend Features (PENDING)
-- **Drive History Dashboard**: Requires fetching trip history associated with user profile. (Supabase queries).
-- **Drive Streak Counter**: Requires DB queries or cron-jobs to calculate and track consecutive day streak generation.
 
 ## V2 Backend Features (PENDING)
 - **Passenger Co-Crediting**: Requires endpoints for QR code payload generation and validation, linking a trip ID to an additional user profile without overwriting original driver data.

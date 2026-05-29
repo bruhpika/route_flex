@@ -21,6 +21,8 @@ export default function Dashboard() {
   const { setStatus } = useTripStore()
   const { profile, setProfile, user } = useAuthStore()
   const [trips, setTrips] = useState<Trip[]>([])
+  const [streak, setStreak] = useState(0)
+  const [totalDistance, setTotalDistance] = useState(0)
   const [loading, setLoading] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [spotifyConnected, setSpotifyConnected] = useState(false)
@@ -28,9 +30,9 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, tripsRes, spotifyRes] = await Promise.all([
+        const [profileRes, dashboardRes, spotifyRes] = await Promise.all([
           fetch('/api/profile'),
-          fetch('/api/trips'),
+          fetch('/api/dashboard'),
           fetch('/api/spotify/status')
         ])
 
@@ -46,9 +48,11 @@ export default function Dashboard() {
           setShowOnboarding(true)
         }
 
-        if (tripsRes.ok) {
-          const tripsData = await tripsRes.json()
-          setTrips(tripsData.trips || [])
+        if (dashboardRes.ok) {
+          const dashData = await dashboardRes.json()
+          setTrips(dashData.trips || [])
+          setStreak(dashData.streak || 0)
+          setTotalDistance(dashData.totalDistance || 0)
         }
 
         if (spotifyRes.ok) {
@@ -104,7 +108,7 @@ export default function Dashboard() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
           <div className="space-y-4">
-            <span className="text-primary text-[10px] font-medium uppercase tracking-[0.4em] block">Personal Index</span>
+            <span className="text-primary text-[10px] font-medium uppercase tracking-[0.4em] block">Motion Memorandum</span>
             <h1 className="font-display text-5xl md:text-7xl text-text leading-tight">
               Welcome back, <br />
               <span className="italic font-light text-muted">{username}</span>
@@ -112,20 +116,22 @@ export default function Dashboard() {
           </div>
 
           <div className="flex flex-col items-start md:items-end gap-6">
-            <div className="glass-panel p-6 flex items-center gap-8 w-full md:w-auto">
+             <div className="glass-panel p-6 flex flex-col md:flex-row items-start md:items-center gap-8 w-full md:w-auto">
                <div className="flex flex-col">
-                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold mb-1">Status</p>
+                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold mb-1">Drive Streak</p>
                  <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
-                   <p className="text-[10px] font-bold text-text uppercase tracking-widest">Active System</p>
+                   <span className="text-xl">🔥</span>
+                   <p className="text-[14px] font-bold text-text tracking-widest">{streak} Days</p>
                  </div>
                </div>
-               <div className="w-px h-8 bg-white/10" />
+               <div className="hidden md:block w-px h-8 bg-white/10" />
                <div className="flex flex-col">
-                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold mb-1">Vehicle</p>
-                 <p className="text-[10px] font-bold text-text uppercase tracking-widest truncate max-w-[120px]">
-                   {profile?.car_name || 'Generic Unit'}
-                 </p>
+                 <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold mb-1">Total Distance</p>
+                 <div className="flex items-center gap-2">
+                   <p className="text-[14px] font-bold text-text tracking-widest truncate max-w-[120px]">
+                     {totalDistance.toFixed(0)} <span className="text-xs text-muted">km</span>
+                   </p>
+                 </div>
                </div>
             </div>
 

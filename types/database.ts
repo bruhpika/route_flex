@@ -49,6 +49,8 @@ export interface Database {
           spotify_track: Json | null
           ai_caption: string | null
           card_template: 'cyberpunk' | 'minimal' | 'y2k' | null
+          accent_color: string | null
+          smoothness_details: Json | null
           raw_coords: Json | null
           created_at: string | null
         }
@@ -68,6 +70,8 @@ export interface Database {
           spotify_track?: Json | null
           ai_caption?: string | null
           card_template?: 'cyberpunk' | 'minimal' | 'y2k' | null
+          accent_color?: string | null
+          smoothness_details?: Json | null
           raw_coords?: Json | null
           created_at?: string | null
         }
@@ -87,6 +91,8 @@ export interface Database {
           spotify_track?: Json | null
           ai_caption?: string | null
           card_template?: 'cyberpunk' | 'minimal' | 'y2k' | null
+          accent_color?: string | null
+          smoothness_details?: Json | null
           raw_coords?: Json | null
           created_at?: string | null
         }

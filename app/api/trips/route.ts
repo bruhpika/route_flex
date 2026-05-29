@@ -95,3 +95,46 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+/**
+ * PATCH /api/trips
+ * Updates an existing trip (e.g. caption, tag, spotify_track).
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const supabase = createRouteHandlerClient<Database>({ cookies })
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { id, ...updates } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing trip id' }, { status: 400 })
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('trips') as any)
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', user.id) // Security check
+      .select()
+      .single()
+
+    if (error) {
+      console.error('[PATCH /api/trips]', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ trip: data }, { status: 200 })
+  } catch (err) {
+    console.error('[PATCH /api/trips] unexpected error', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

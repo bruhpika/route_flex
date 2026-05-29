@@ -30,6 +30,9 @@ function ResultContent() {
   const [spotifyTrack, setSpotifyTrack] = useState<SpotifyTrack | null>(null)
   const [showRoute, setShowRoute] = useState(true)
   const [customImageUrl, setCustomImageUrl] = useState<string | null>(null)
+  const [captionTone, setCaptionTone] = useState<'hype' | 'poetic' | 'unhinged'>('hype')
+  const [customListeningText, setCustomListeningText] = useState('')
+  const [accentColor, setAccentColor] = useState('#2DD4BF') // Default to our primary teal
 
   const cardRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -53,6 +56,44 @@ function ResultContent() {
     if (customImageUrl) URL.revokeObjectURL(customImageUrl)
     setCustomImageUrl(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const generateCaption = async (tone: 'hype' | 'poetic' | 'unhinged') => {
+    if (!trip) return
+    toast.loading('Generating caption...', { id: 'caption' })
+    try {
+      const res = await fetch('/api/generate-caption', {
+        method: 'POST',
+        body: JSON.stringify({ distance: trip.distance, topSpeed: trip.topSpeed, smoothness: trip.smoothnessScore, tone })
+      })
+      if (res.ok) {
+        const { caption } = await res.json()
+        setTrip(t => t ? ({ ...t, ai_caption: caption }) : null)
+        if (trip.id) {
+           await fetch('/api/trips', { method: 'PATCH', body: JSON.stringify({ id: trip.id, ai_caption: caption })})
+        }
+        toast.success('Caption updated!', { id: 'caption' })
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error('Failed to generate', { id: 'caption' })
+    }
+  }
+
+  const handleToneChange = (tone: 'hype' | 'poetic' | 'unhinged') => {
+    soundManager?.play('click', 0.2)
+    setCaptionTone(tone)
+    generateCaption(tone)
+  }
+
+  const handleListeningTextChange = async (val: string) => {
+    setCustomListeningText(val)
+    if (trip?.id) {
+       await fetch('/api/trips', {
+         method: 'PATCH',
+         body: JSON.stringify({ id: trip.id, spotify_track: val ? { custom_text: val } : spotifyTrack })
+       })
+    }
   }
 
   const getRecentTrack = async () => {
@@ -95,16 +136,26 @@ function ResultContent() {
           setTrip({
             ...data,
             smoothnessScore: data.smoothness_score,
+            accelVariance: data.smoothness_details?.accelVariance,
+            hardBrakes: data.smoothness_details?.hardBrakes,
+            lateralG: data.smoothness_details?.lateralG,
             topSpeed: data.top_speed,
+            accent_color: data.accent_color || '#2DD4BF',
             mapUrl: generateMapImageUrl([], true)
           })
+          if (data.accent_color) setAccentColor(data.accent_color)
+          if (data.spotify_track?.custom_text) {
+             setCustomListeningText(data.spotify_track.custom_text)
+          } else if (data.spotify_track) {
+             setSpotifyTrack(data.spotify_track)
+          }
           setLoading(false)
           soundManager?.play('archive', 0.5)
           return
         }
       }
 
-      const smoothness = calculateSmoothnessScore(coords)
+      const smoothnessResult = calculateSmoothnessScore(coords)
       const distance = coords.length > 0 ? (coords[coords.length-1].distance || 0) : 0
       
       let suggestedTag = 'commute'
@@ -115,10 +166,14 @@ function ResultContent() {
       const initialTrip = {
         distance,
         topSpeed,
-        smoothnessScore: smoothness,
+        smoothnessScore: smoothnessResult.score,
+        accelVariance: smoothnessResult.accelVariance,
+        hardBrakes: smoothnessResult.hardBrakes,
+        lateralG: smoothnessResult.lateralG,
         mapUrl: generateMapImageUrl(coords, true),
         ai_caption: '',
-        trip_tag: suggestedTag.toUpperCase()
+        trip_tag: suggestedTag.toUpperCase(),
+        accent_color: accentColor
       }
       setTrip(initialTrip)
 
@@ -126,7 +181,7 @@ function ResultContent() {
         getRecentTrack(),
         fetch('/api/generate-caption', {
           method: 'POST',
-          body: JSON.stringify({ distance: initialTrip.distance, topSpeed, smoothness })
+          body: JSON.stringify({ distance: initialTrip.distance, topSpeed, smoothness: smoothnessResult.score, tone: captionTone })
         })
       ])
 
@@ -143,9 +198,17 @@ function ResultContent() {
           coords,
           distance: initialTrip.distance,
           top_speed: topSpeed,
-          smoothness_score: smoothness,
+          smoothness_score: smoothnessResult.score,
+          smoothness_details: {
+            accelVariance: smoothnessResult.accelVariance,
+            hardBrakes: smoothnessResult.hardBrakes,
+            lateralG: smoothnessResult.lateralG
+          },
           started_at: new Date(startedAt).toISOString(),
-          trip_tag: suggestedTag.toUpperCase()
+          trip_tag: suggestedTag.toUpperCase(),
+          ai_caption: trip?.ai_caption || '',
+          spotify_track: track,
+          accent_color: accentColor
         })
       })
 
@@ -224,6 +287,17 @@ function ResultContent() {
         method: 'PATCH',
         body: JSON.stringify({ id: trip.id, trip_tag: tag.toUpperCase() })
       })
+    }
+  }
+
+  const handleAccentColorChange = async (color: string) => {
+    setAccentColor(color)
+    setTrip(t => t ? ({ ...t, accent_color: color }) : null)
+    if (trip?.id) {
+       await fetch('/api/trips', {
+         method: 'PATCH',
+         body: JSON.stringify({ id: trip.id, accent_color: color })
+       })
     }
   }
 
@@ -375,6 +449,59 @@ function ResultContent() {
                  </span>
                </Button>
              </div>
+
+             <div className="space-y-6 pt-4 border-t border-white/5">
+               <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold">Caption Tone Selector</p>
+               <div className="flex gap-4">
+                 {(['hype', 'poetic', 'unhinged'] as const).map((tone) => (
+                   <button
+                     key={tone}
+                     onClick={() => handleToneChange(tone)}
+                     className={cn(
+                       "px-4 py-2 rounded-sm border text-[9px] font-bold transition-all uppercase tracking-widest",
+                       captionTone === tone
+                       ? 'bg-primary border-primary text-black'
+                       : 'bg-white/5 border-white/10 text-muted hover:border-white/20'
+                     )}
+                   >
+                     {tone}
+                   </button>
+                 ))}
+               </div>
+             </div>
+
+             <div className="space-y-4 pt-4 border-t border-white/5">
+               <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold">Custom Listening To</p>
+               <input
+                 type="text"
+                 placeholder="Podcast, Playlist, Silence..."
+                 value={customListeningText}
+                 onChange={(e) => handleListeningTextChange(e.target.value)}
+                 className="w-full h-12 bg-white/5 border border-white/10 rounded-sm px-4 text-xs font-display italic text-text focus:outline-none focus:border-primary/50 transition-colors"
+               />
+               <p className="text-[8px] text-muted tracking-wide italic">Overrides your connected Spotify track if provided.</p>
+             </div>
+             <div className="space-y-4 pt-4 border-t border-white/5">
+               <p className="text-[9px] uppercase tracking-[0.2em] text-muted font-bold">Accent Color</p>
+               <div className="flex gap-4 items-center">
+                 {['#2DD4BF', '#F43F5E', '#3B82F6', '#EAB308'].map(color => (
+                   <button
+                     key={color}
+                     onClick={() => handleAccentColorChange(color)}
+                     className="w-6 h-6 rounded-full border border-white/20 transition-transform hover:scale-110"
+                     style={{ backgroundColor: color, outline: accentColor === color ? `2px solid ${color}` : 'none', outlineOffset: '2px' }}
+                   />
+                 ))}
+                 <div className="h-4 w-[1px] bg-white/20 mx-2"></div>
+                 <input
+                   type="color"
+                   value={accentColor}
+                   onChange={(e) => handleAccentColorChange(e.target.value)}
+                   className="w-8 h-8 rounded-sm bg-transparent cursor-pointer border-0 p-0"
+                 />
+                 <span className="text-[10px] text-muted font-mono">{accentColor}</span>
+               </div>
+             </div>
           </div>
 
           <div className="flex items-center gap-6 opacity-40">
@@ -395,6 +522,7 @@ function ResultContent() {
                 carEmoji={profile?.car_emoji || undefined}
                 customImageUrl={customImageUrl || undefined}
                 userNickname={profile?.username || undefined}
+                customListeningText={customListeningText || undefined}
               />
             </div>
           )}

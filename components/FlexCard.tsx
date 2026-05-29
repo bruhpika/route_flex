@@ -15,6 +15,7 @@ interface FlexCardProps {
   carEmoji?: string
   customImageUrl?: string  // user-uploaded image overrides the map
   userNickname?: string
+  customListeningText?: string
 }
 
 const Counter = ({ value, duration = 2, precision = 0 }: { value: number, duration?: number, precision?: number }) => {
@@ -29,7 +30,7 @@ const Counter = ({ value, duration = 2, precision = 0 }: { value: number, durati
   return <motion.span>{rounded}</motion.span>
 }
 
-const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl, userNickname }: FlexCardProps) => {
+const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl, userNickname, customListeningText }: FlexCardProps) => {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -41,7 +42,10 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl, userN
   const backgroundUrl = customImageUrl || trip.customImageUrl || trip.mapUrl
 
   return (
-    <div className="relative aspect-[3/4] w-full max-w-[500px] bg-[#0A0B0A] overflow-hidden rounded-sm group cursor-pointer border border-white/5 shadow-2xl">
+    <div 
+      className="relative aspect-[3/4] w-full max-w-[500px] bg-[#0A0B0A] overflow-hidden rounded-sm group cursor-pointer border border-white/5 shadow-2xl"
+      style={trip.accent_color ? { '--primary': trip.accent_color } as React.CSSProperties : undefined}
+    >
       {/* Background Map / Custom Photo with Slow Zoom */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {backgroundUrl ? (
@@ -113,12 +117,29 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl, userN
                 <span className="text-xs italic ml-1 opacity-40">km</span>
               </p>
             </div>
-            <div className="space-y-1 text-right">
+            <div className="space-y-1 text-right relative group/smoothness cursor-help">
               <p className="text-[9px] font-medium text-muted uppercase tracking-[0.2em]">Smoothness</p>
               <p className="text-2xl font-display text-primary italic">
                 {mounted ? <Counter value={trip.smoothnessScore} /> : trip.smoothnessScore}
                 <span className="text-xs font-body not-italic ml-1 opacity-40">/100</span>
               </p>
+
+              {/* Tooltip */}
+              <div className="absolute right-0 bottom-full mb-2 w-48 p-4 glass-panel rounded-sm opacity-0 group-hover/smoothness:opacity-100 transition-opacity pointer-events-none z-30">
+                <p className="text-[9px] uppercase tracking-widest text-primary mb-3 font-bold border-b border-white/10 pb-2">Score Breakdown</p>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[8px] text-muted uppercase">Accel Var</span>
+                  <span className="text-xs font-mono">{trip.accelVariance || 0}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[8px] text-muted uppercase">Hard Brakes</span>
+                  <span className="text-xs font-mono">{trip.hardBrakes || 0}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[8px] text-muted uppercase">Lateral G</span>
+                  <span className="text-xs font-mono">{trip.lateralG || 0}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -144,22 +165,32 @@ const FlexCard = ({ trip, spotifyTrack, carName, carEmoji, customImageUrl, userN
           </div>
         </div>
 
-        {/* Spotify Overlay (Optional) */}
-        {spotifyTrack && (
+        {/* Audio Overlay (Spotify or Custom) */}
+        {(spotifyTrack || customListeningText) && (
           <div className="mt-6 flex items-center gap-4 group/spotify">
-            <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-white/10 shadow-lg">
-              <Image 
-                src={spotifyTrack.album_art_url} 
-                alt="Album" 
-                width={40}
-                height={40}
-                className="object-cover" 
-              />
-              <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover/spotify:opacity-100 transition-opacity" />
-            </div>
+            {customListeningText ? (
+              <div className="w-10 h-10 rounded-sm border border-white/10 shadow-lg flex items-center justify-center bg-white/5">
+                <span className="material-symbols-outlined text-primary text-xl">graphic_eq</span>
+              </div>
+            ) : (
+              <div className="relative w-10 h-10 rounded-sm overflow-hidden border border-white/10 shadow-lg">
+                <Image 
+                  src={spotifyTrack!.album_art_url} 
+                  alt="Album" 
+                  width={40}
+                  height={40}
+                  className="object-cover" 
+                />
+                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover/spotify:opacity-100 transition-opacity" />
+              </div>
+            )}
             <div className="flex flex-col">
-              <p className="text-[10px] font-bold text-text truncate max-w-[180px] uppercase tracking-tight">{spotifyTrack.name}</p>
-              <p className="text-[9px] text-muted truncate max-w-[180px] uppercase tracking-widest italic">{spotifyTrack.artist}</p>
+              <p className="text-[10px] font-bold text-text truncate max-w-[180px] uppercase tracking-tight">
+                {customListeningText || spotifyTrack!.name}
+              </p>
+              <p className="text-[9px] text-muted truncate max-w-[180px] uppercase tracking-widest italic">
+                {customListeningText ? 'Currently Playing' : spotifyTrack!.artist}
+              </p>
             </div>
           </div>
         )}

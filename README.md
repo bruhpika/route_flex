@@ -9,33 +9,42 @@
 
 ---
 
-## 🌟 Key Features
+## 🌟 Comprehensive Feature Set
 
 ### 🏎️ Live Telemetry Engine
-- **OLED-Optimized Dashboard**: High-contrast, brutalist interface for real-time tracking.
-- **Motion Geometry**: Precise calculation of distance, top speed, and smoothness scores.
-- **Smart Wake-Lock**: Advanced screen timeout prevention with automatic re-acquisition logic for uninterrupted tracking.
+- **OLED-Optimized Dashboard**: High-contrast, brutalist interface designed specifically for minimal distraction and OLED battery savings.
+- **Motion Geometry**: Precise calculation of distance, top speed, average speed, and a proprietary **Smoothness Score** (0-100) that evaluates hard braking and harsh acceleration.
+- **Smart Wake-Lock**: Advanced screen timeout prevention (`navigator.wakeLock`) with automatic re-acquisition logic for uninterrupted GPS tracking.
+- **Offline Resilience**: Progressive Web App (PWA) architecture ensures the app handles intermittent connectivity gracefully with dedicated offline fallbacks.
 
 ### 🗃️ Aesthetic Flex Cards
-- **Curated Templates**: Export your drive as shareable artifacts in three distinct styles: Cyberpunk, Minimal, and Y2K.
-- **Map Visualizations**: Dynamic grayscale route snapshots generated for every trip.
-- **AI-Powered Narratives**: Automated hype captions that capture the "vibe" of your drive.
+- **Curated Templates**: Export your drive as shareable artifacts in three distinct, interactive styles: Cyberpunk (neon glow), Minimal (clean data art), and Y2K (grainy retro).
+- **Dynamic Map Compositing**: Real-time Mapbox route visualizations via Static Images API, processed with custom CSS filters.
+- **Privacy Controls**: Easily toggle between exact route paths or obscured city-level coordinate blur before sharing.
+- **Trip Tagging**: Contextualise your drive with tags like Commute 🏙️, Midnight 🌙, or Road Trip 🛣️.
+
+### 🤖 AI-Powered Narratives
+- **Groq Integration**: Leverages the blazing-fast `llama-3.3-70b-versatile` model via Groq SDK.
+- **Contextual Hype**: Automatically generates snarky, engaging captions that capture the true "vibe" of your drive based on your telemetry data.
 
 ### 🎵 Auditory Integration
-- **Spotify Web API**: Connect your account to automatically embed the music you were listening to directly into your telemetry logs.
+- **Spotify Web API**: Connect your account (via OAuth 2.0 PKCE flow) to automatically embed your recently played music directly into your telemetry logs.
 - **Ambient Feedback**: A custom `soundManager` providing micro-interaction audio cues for a tactile UI experience.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Architecture
 
 - **Framework**: [Next.js 14 (App Router)](https://nextjs.org/)
-- **Database & Auth**: [Supabase](https://supabase.com/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Animation**: [Framer Motion](https://www.framer.com/motion/)
-- **Typography**: [Google Fonts (Inter, Outfit)](https://fonts.google.com/)
-- **Icons**: Lucide React & Google Material Symbols
-- **Audio**: Custom Sound Manager via Web Audio API
+- **Language**: TypeScript (Strict Mode)
+- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL + RLS + S3 Storage)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (Auth, Trip, and Template stores)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with Shadcn/ui elements
+- **Animation**: [Framer Motion](https://www.framer.com/motion/) & CSS Transitions
+- **Mapping**: Mapbox Static Images API
+- **AI Inference**: Groq SDK
+- **Card Engine**: `html2canvas` for DOM-to-PNG retina exports
+- **PWA**: `next-pwa`
 
 ---
 
@@ -45,6 +54,8 @@
 - Node.js 18+ 
 - A Supabase project
 - A Spotify Developer Dashboard account (for Client ID/Secret)
+- Groq API Key
+- Mapbox Access Token
 
 ### Installation
 
@@ -62,15 +73,19 @@
 3. **Configure Environment Variables**
    Create a `.env.local` file in the root directory:
    ```env
+   # Supabase
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    
+   # Spotify OAuth
    SPOTIFY_CLIENT_ID=your_spotify_client_id
    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
    NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=http://localhost:3000/api/auth/spotify/callback
    
+   # AI & Mapping
    GROQ_API_KEY=your_groq_api_key
+   NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token
    ```
 
 4. **Run Development Server**
@@ -80,11 +95,22 @@
 
 ---
 
-## 📐 Architecture & Design
+## 📐 Repository Structure
 
-RouteFlex follows a **Blackboard Architecture** for its development cycle, ensuring that every feature—from the tracking hook to the AI caption generator—is verified against a strict PRD (Product Requirements Document).
+The project has been configured for highly professional enterprise scaling:
 
-The UI is inspired by **Brutalist Urbanism** and **Premium Editorial Design**, prioritizing typography and space over decorative elements.
+```
+route_flex/
+├── src/
+│   ├── app/           # Next.js App Router (pages, api, layouts)
+│   ├── components/    # Reusable UI elements and Shadcn overrides
+│   ├── hooks/         # Custom React hooks (e.g., useGeolocation)
+│   ├── lib/           # Utility functions (Mapbox, Smoothness algos, Spotify client)
+│   ├── store/         # Zustand global state management
+│   └── types/         # Strict TypeScript interfaces
+├── public/            # Static assets and PWA manifests
+└── supabase/          # Database migrations and edge functions
+```
 
 ---
 
